@@ -18,6 +18,7 @@
 
 import Foundation
 import SwiftData
+import Security
 
 /// Persistence configuration for ShiftFlow.
 ///
@@ -107,7 +108,17 @@ enum PersistenceConfiguration {
             )) ?? emptyFallback()
         }
 
-        if useCloudKit {
+        // Only attempt CloudKit when the iCloud entitlement is actually present.
+        //
+        // Creating a CloudKit-backed ModelContainer can SUCCEED and then trap at
+        // runtime inside CloudKit ("BUG IN CLIENT OF CLOUDKIT ... requires the
+        // com.apple.developer.icloud-services entitlement") when the build is not
+        // signed with the iCloud capability — e.g. an unsigned CI simulator build
+        // (CODE_SIGNING_ALLOWED=NO). That trap is not a catchable Swift error, so
+        // `try?` cannot recover from it. Gating on the entitlement keeps the
+        // documented offline-first fallback and never changes behavior for a
+        // properly-signed build (which does have the entitlement).
+        if useCloudKit && hasCloudKitEntitlement {
             if let cloudContainer = try? ModelContainer(
                 for: schema,
                 configurations: [makeCloudKitConfiguration()]
@@ -121,6 +132,29 @@ enum PersistenceConfiguration {
             for: schema,
             configurations: [makeLocalConfiguration(inMemory: false)]
         )) ?? emptyFallback()
+    }
+
+    /// Whether the running process is provisioned with the iCloud/CloudKit
+    /// entitlement (`com.apple.developer.icloud-services` including "CloudKit").
+    ///
+    /// Reads the current executable's embedded entitlements at runtime via
+    /// `SecTask`. Returns false for unsigned/ad-hoc builds (e.g. CI simulator
+    /// with CODE_SIGNING_ALLOWED=NO), so the app uses the local-only store and
+    /// does not trip CloudKit's entitlement precondition trap.
+    static var hasCloudKitEntitlement: Bool {
+        guard let task = SecTaskCreateFromSelf(nil) else { return false }
+        let key = "com.apple.developer.icloud-services" as CFString
+        guard let value = SecTaskCopyValueForEntitlement(task, key, nil) else {
+            return false
+        }
+        if let services = value as? [String] {
+            return services.contains("CloudKit") || services.contains("CloudKit-Anonymous")
+        }
+        // The entitlement can also be the literal "*" (wildcard) in some profiles.
+        if let single = value as? String {
+            return single == "CloudKit" || single == "CloudKit-Anonymous" || single == "*"
+        }
+        return false
     }
 
     /// Last-resort in-memory container so the app never crashes on launch.
