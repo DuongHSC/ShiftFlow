@@ -421,16 +421,27 @@ final class WidgetRefreshIntegrationTests: XCTestCase {
 
         _ = try service.createWorkDay(date: today, shift: c5, rules: c5Rules)
 
-        // Refresh many times.
+        // createWorkDay intentionally triggers ONE automatic refresh using the
+        // real current day (Date()); that snapshot is NOT the baseline here.
+        // Ignore any snapshots published before our explicit day15 refreshes.
+        let publishedByCreate = sink.publishCount
+
+        // Explicit refresh with a fixed referenceDate establishes the baseline.
+        coordinator.refresh(referenceDate: today)
+        let baseline = sink.lastSnapshot!
+
+        // Repeated refreshes using the SAME referenceDate must be identical.
         for _ in 0..<10 {
             coordinator.refresh(referenceDate: today)
         }
 
-        // All snapshots identical (deterministic rebuild).
-        let first = sink.publishedSnapshots.first!
-        for snap in sink.publishedSnapshots {
-            XCTAssertEqual(snap.today?.startDateTime, first.today?.startDateTime)
-            XCTAssertEqual(snap.today?.shiftCode, first.today?.shiftCode)
+        // Invariant: every snapshot produced by an explicit day15 refresh
+        // (baseline + repeats) is identical — deterministic rebuild.
+        let explicitSnapshots = Array(sink.publishedSnapshots.dropFirst(publishedByCreate))
+        XCTAssertFalse(explicitSnapshots.isEmpty)
+        for snap in explicitSnapshots {
+            XCTAssertEqual(snap.today?.startDateTime, baseline.today?.startDateTime)
+            XCTAssertEqual(snap.today?.shiftCode, baseline.today?.shiftCode)
         }
     }
 
