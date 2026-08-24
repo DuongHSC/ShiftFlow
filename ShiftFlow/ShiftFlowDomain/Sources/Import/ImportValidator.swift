@@ -136,6 +136,11 @@ public enum ImportValidator {
         let formatter = DateFormatter()
         formatter.dateFormat = dateFormat
         formatter.calendar = calendar
+        // Parse in the SAME time zone as the calendar so the resulting date-only
+        // value matches how export/WorkDay produce it (symmetric round-trip).
+        // Without this, DateFormatter uses the system time zone and midnight in
+        // the app's time zone would map to a different calendar day.
+        formatter.timeZone = calendar.timeZone
         formatter.isLenient = false
 
         guard let date = formatter.date(from: dateString) else {

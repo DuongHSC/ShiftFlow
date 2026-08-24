@@ -250,6 +250,9 @@ public final class ShiftImportService {
         let formatter = DateFormatter()
         formatter.dateFormat = "dd/MM/yyyy"
         formatter.calendar = calendar
+        // Same time zone as the calendar so conflict-detection dates align with
+        // stored WorkDay dates (see ImportValidator/ShiftExportService).
+        formatter.timeZone = calendar.timeZone
         formatter.isLenient = false
 
         var existingDates = Set<Date>()

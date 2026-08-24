@@ -39,6 +39,13 @@ public final class ShiftExportService {
         self.dateFormatter = DateFormatter()
         self.dateFormatter.dateFormat = ShiftTemplate.dateFormat
         self.dateFormatter.calendar = calendar
+        // Format the date in the SAME time zone as the calendar that produced it.
+        // WorkDay.date is a startOfDay value in `calendar`'s time zone; without
+        // this, DateFormatter uses the system time zone (e.g. UTC on CI) and a
+        // local-midnight date renders as the previous calendar day. Aligning the
+        // time zone keeps the date-only value stable across export/import/sort/
+        // round-trip. No offset hacks, no dependence on the machine time zone.
+        self.dateFormatter.timeZone = calendar.timeZone
     }
 
     // MARK: - Export WorkDays

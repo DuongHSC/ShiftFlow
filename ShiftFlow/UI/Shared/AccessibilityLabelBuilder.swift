@@ -61,7 +61,10 @@ enum AccessibilityLabelBuilder {
     // MARK: - Private
 
     /// Builds a spoken time-range phrase "HH:mm đến HH:mm".
+    ///
+    /// Uses the provided calendar's time zone so the spoken clock time matches
+    /// the resolved shift time (not the system/UTC time zone).
     private static func timePhrase(start: Date, end: Date, calendar: Calendar) -> String {
-        "\(TimeFormatter.format(start)) đến \(TimeFormatter.format(end))"
+        "\(TimeFormatter.format(start, calendar: calendar)) đến \(TimeFormatter.format(end, calendar: calendar))"
     }
 }
