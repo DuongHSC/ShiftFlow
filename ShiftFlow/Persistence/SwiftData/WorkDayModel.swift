@@ -21,6 +21,7 @@
 
 import Foundation
 import SwiftData
+import ShiftFlowDomain
 
 /// SwiftData persistence model for a scheduled work day.
 ///

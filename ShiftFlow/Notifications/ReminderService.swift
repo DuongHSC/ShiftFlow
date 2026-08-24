@@ -297,18 +297,9 @@ public final class ReminderService {
     }
 }
 
-// MARK: - TimeFormatter (reuse from UI layer concept)
-
-/// Local time formatter for notification content.
-/// (Duplicated minimally here to avoid UI layer dependency.)
-private enum TimeFormatter {
-    private static let formatter: DateFormatter = {
-        let f = DateFormatter()
-        f.dateFormat = "HH:mm"
-        return f
-    }()
-
-    static func format(_ date: Date) -> String {
-        formatter.string(from: date)
-    }
-}
+// TASK-GITHUB-ACTIONS-FIX-004:
+// The previously-duplicated `private enum TimeFormatter` was removed to fix an
+// "invalid redeclaration of 'TimeFormatter'" error — it collided with the
+// existing shared `TimeFormatter` (UI/Shared/TimeFormatter.swift) in the same
+// app module. `buildNotificationContent` reuses that shared, functionally
+// equivalent `TimeFormatter.format(_:)`. Reminder behavior is unchanged.
