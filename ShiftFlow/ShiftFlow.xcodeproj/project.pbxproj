@@ -1,0 +1,686 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		A0010001 /* ShiftFlowApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0010001; };
+		A0010002 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0010002; };
+		A0010003 /* AppContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0010003; };
+		A0010004 /* ShiftDefinitionProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0010004; };
+		A0010005 /* CalendarViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0010005; };
+		A0010006 /* DataManagementViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0010006; };
+		A0010007 /* DayDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0010007; };
+		A0010008 /* ShiftSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0010008; };
+		A0010009 /* TaskSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0010009; };
+		A0010010 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0010010; };
+		A0010011 /* ReminderModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0010011; };
+		A0010012 /* ReminderService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0010012; };
+		A0010013 /* CloudSyncService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0010013; };
+		A0010014 /* PersistenceContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0010014; };
+		A0010015 /* ScheduleRuleModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0010015; };
+		A0010016 /* ShiftDefinitionModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0010016; };
+		A0010017 /* SwiftDataShiftConfigurationStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0010017; };
+		A0010018 /* SwiftDataTaskStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0010018; };
+		A0010019 /* SwiftDataWorkDayRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0010019; };
+		A0010020 /* TaskDefinitionModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0010020; };
+		A0010021 /* WorkDayModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0010021; };
+		A0010022 /* WorkDayTaskModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0010022; };
+		A0010023 /* CalendarScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0010023; };
+		A0010024 /* DayDetailSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0010024; };
+		A0010025 /* MonthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0010025; };
+		A0010026 /* ThreeDaysView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0010026; };
+		A0010027 /* TodayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0010027; };
+		A0010028 /* WeekView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0010028; };
+		A0010029 /* CSVExportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0010029; };
+		A0010030 /* CSVFileWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0010030; };
+		A0010031 /* CSVImportPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0010031; };
+		A0010032 /* CSVImportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0010032; };
+		A0010033 /* DataManagementView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0010033; };
+		A0010034 /* ScheduleRuleEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0010034; };
+		A0010035 /* SettingsScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0010035; };
+		A0010036 /* ShiftEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0010036; };
+		A0010037 /* TaskDefinitionEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0010037; };
+		A0010038 /* TaskSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0010038; };
+		A0010039 /* AccessibilityLabelBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0010039; };
+		A0010040 /* DesignConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0010040; };
+		A0010041 /* ShiftStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0010041; };
+		A0010042 /* TimeFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0010042; };
+		A0010043 /* WeekdayFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0010043; };
+		A0010044 /* AppGroupWidgetSnapshotSink.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0010044; };
+		A0010048 /* WidgetDataProvider.swift in Sources (App) */ = {isa = PBXBuildFile; fileRef = B0020004; };
+		A0010045 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B0010045; };
+		A0010046 /* ShiftFlowDomain in Frameworks */ = {isa = PBXBuildFile; productRef = P0000001; };
+		A0010047 /* ShiftFlowWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = C0000002; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+
+		A0020001 /* ShiftFlowWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0020001; };
+		A0020002 /* ShiftFlowWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0020002; };
+		A0020003 /* ShiftFlowTimelineProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0020003; };
+		A0020004 /* WidgetDataProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0020004; };
+		A0020005 /* ShiftFlowWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0020005; };
+		A0020006 /* SmallWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0020006; };
+		A0020007 /* MediumWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0020007; };
+		A0020008 /* LargeWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0020008; };
+		A0020009 /* WidgetFormatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0020009; };
+		A0020010 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B0010045; };
+		A0020011 /* ShiftFlowDomain in Frameworks */ = {isa = PBXBuildFile; productRef = P0000002; };
+
+		A0030001 /* ShiftFlowTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0030001; };
+		A0030002 /* CalendarViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0030002; };
+		A0030003 /* CloudKitSyncTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0030003; };
+		A0030004 /* DataManagementViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0030004; };
+		A0030005 /* InMemoryWorkDayRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0030005; };
+		A0030006 /* IntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0030006; };
+		A0030007 /* PersistenceMappingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0030007; };
+		A0030008 /* PolishTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0030008; };
+		A0030009 /* ReminderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0030009; };
+		A0030010 /* ShiftImportTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0030010; };
+		A0030011 /* ShiftResolverTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0030011; };
+		A0030012 /* ShiftSeedProviderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0030012; };
+		A0030013 /* ShiftSettingsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0030013; };
+		A0030014 /* TaskManagementTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0030014; };
+		A0030015 /* TaskSettingsViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0030015; };
+		A0030016 /* WidgetRefreshIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0030016; };
+		A0030017 /* WidgetScheduleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0030017; };
+		A0030018 /* WorkDayServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0030018; };
+		A0030019 /* ShiftFlowDomain in Frameworks */ = {isa = PBXBuildFile; productRef = P0000003; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		D0000001 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E0000001 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C0000001T;
+			remoteInfo = ShiftFlowWidgetExtension;
+		};
+		D0000002 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E0000001 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C0000000;
+			remoteInfo = ShiftFlow;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		F0000001 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				A0010047 /* ShiftFlowWidgetExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		C0000001 /* ShiftFlow.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ShiftFlow.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		C0000002 /* ShiftFlowWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = ShiftFlowWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		C0000003 /* ShiftFlowTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ShiftFlowTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		C0000010 /* ShiftFlowDomain */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = ShiftFlowDomain; sourceTree = "<group>"; };
+
+		B0010001 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShiftFlowApp.swift; sourceTree = "<group>"; };
+		B0010002 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		B0010003 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppContainer.swift; sourceTree = "<group>"; };
+		B0010004 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShiftDefinitionProvider.swift; sourceTree = "<group>"; };
+		B0010005 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarViewModel.swift; sourceTree = "<group>"; };
+		B0010006 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataManagementViewModel.swift; sourceTree = "<group>"; };
+		B0010007 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayDetailViewModel.swift; sourceTree = "<group>"; };
+		B0010008 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShiftSettingsViewModel.swift; sourceTree = "<group>"; };
+		B0010009 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskSettingsViewModel.swift; sourceTree = "<group>"; };
+		B0010010 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
+		B0010011 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReminderModels.swift; sourceTree = "<group>"; };
+		B0010012 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReminderService.swift; sourceTree = "<group>"; };
+		B0010013 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudSyncService.swift; sourceTree = "<group>"; };
+		B0010014 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceContainer.swift; sourceTree = "<group>"; };
+		B0010015 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleRuleModel.swift; sourceTree = "<group>"; };
+		B0010016 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShiftDefinitionModel.swift; sourceTree = "<group>"; };
+		B0010017 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftDataShiftConfigurationStore.swift; sourceTree = "<group>"; };
+		B0010018 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftDataTaskStore.swift; sourceTree = "<group>"; };
+		B0010019 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftDataWorkDayRepository.swift; sourceTree = "<group>"; };
+		B0010020 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskDefinitionModel.swift; sourceTree = "<group>"; };
+		B0010021 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkDayModel.swift; sourceTree = "<group>"; };
+		B0010022 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkDayTaskModel.swift; sourceTree = "<group>"; };
+		B0010023 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarScreen.swift; sourceTree = "<group>"; };
+		B0010024 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayDetailSheet.swift; sourceTree = "<group>"; };
+		B0010025 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonthView.swift; sourceTree = "<group>"; };
+		B0010026 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThreeDaysView.swift; sourceTree = "<group>"; };
+		B0010027 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayView.swift; sourceTree = "<group>"; };
+		B0010028 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeekView.swift; sourceTree = "<group>"; };
+		B0010029 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSVExportView.swift; sourceTree = "<group>"; };
+		B0010030 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSVFileWriter.swift; sourceTree = "<group>"; };
+		B0010031 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSVImportPreviewView.swift; sourceTree = "<group>"; };
+		B0010032 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSVImportView.swift; sourceTree = "<group>"; };
+		B0010033 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataManagementView.swift; sourceTree = "<group>"; };
+		B0010034 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleRuleEditView.swift; sourceTree = "<group>"; };
+		B0010035 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsScreen.swift; sourceTree = "<group>"; };
+		B0010036 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShiftEditView.swift; sourceTree = "<group>"; };
+		B0010037 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskDefinitionEditView.swift; sourceTree = "<group>"; };
+		B0010038 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskSettingsView.swift; sourceTree = "<group>"; };
+		B0010039 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessibilityLabelBuilder.swift; sourceTree = "<group>"; };
+		B0010040 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignConstants.swift; sourceTree = "<group>"; };
+		B0010041 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShiftStyle.swift; sourceTree = "<group>"; };
+		B0010042 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeFormatter.swift; sourceTree = "<group>"; };
+		B0010043 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeekdayFormatter.swift; sourceTree = "<group>"; };
+		B0010044 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppGroupWidgetSnapshotSink.swift; sourceTree = "<group>"; };
+		B0010045 = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		B0010050 = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		B0010051 = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ShiftFlow.entitlements; sourceTree = "<group>"; };
+
+		B0020001 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShiftFlowWidget.swift; sourceTree = "<group>"; };
+		B0020002 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShiftFlowWidgetBundle.swift; sourceTree = "<group>"; };
+		B0020003 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShiftFlowTimelineProvider.swift; sourceTree = "<group>"; };
+		B0020004 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetDataProvider.swift; sourceTree = "<group>"; };
+		B0020005 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShiftFlowWidgetView.swift; sourceTree = "<group>"; };
+		B0020006 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmallWidgetView.swift; sourceTree = "<group>"; };
+		B0020007 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediumWidgetView.swift; sourceTree = "<group>"; };
+		B0020008 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LargeWidgetView.swift; sourceTree = "<group>"; };
+		B0020009 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetFormatting.swift; sourceTree = "<group>"; };
+		B0020050 = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		B0020051 = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ShiftFlowWidget.entitlements; sourceTree = "<group>"; };
+
+		B0030001 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShiftFlowTests.swift; sourceTree = "<group>"; };
+		B0030002 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarViewModelTests.swift; sourceTree = "<group>"; };
+		B0030003 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitSyncTests.swift; sourceTree = "<group>"; };
+		B0030004 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataManagementViewModelTests.swift; sourceTree = "<group>"; };
+		B0030005 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InMemoryWorkDayRepository.swift; sourceTree = "<group>"; };
+		B0030006 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntegrationTests.swift; sourceTree = "<group>"; };
+		B0030007 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceMappingTests.swift; sourceTree = "<group>"; };
+		B0030008 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PolishTests.swift; sourceTree = "<group>"; };
+		B0030009 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReminderTests.swift; sourceTree = "<group>"; };
+		B0030010 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShiftImportTests.swift; sourceTree = "<group>"; };
+		B0030011 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShiftResolverTests.swift; sourceTree = "<group>"; };
+		B0030012 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShiftSeedProviderTests.swift; sourceTree = "<group>"; };
+		B0030013 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShiftSettingsTests.swift; sourceTree = "<group>"; };
+		B0030014 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskManagementTests.swift; sourceTree = "<group>"; };
+		B0030015 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskSettingsViewModelTests.swift; sourceTree = "<group>"; };
+		B0030016 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetRefreshIntegrationTests.swift; sourceTree = "<group>"; };
+		B0030017 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetScheduleTests.swift; sourceTree = "<group>"; };
+		B0030018 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkDayServiceTests.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		G0000001 /* Frameworks (App) */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A0010046 /* ShiftFlowDomain in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		G0000002 /* Frameworks (Widget) */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A0020011 /* ShiftFlowDomain in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		G0000003 /* Frameworks (Tests) */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A0030019 /* ShiftFlowDomain in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		H0000000 /* Root */ = {
+			isa = PBXGroup;
+			children = (
+				H0000010 /* App */,
+				H0000011 /* Application */,
+				H0000012 /* Notifications */,
+				H0000013 /* Persistence */,
+				H0000014 /* UI */,
+				H0000015 /* Widget */,
+				H0000016 /* Tests */,
+				C0000010 /* ShiftFlowDomain */,
+				H0000090 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		H0000090 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				C0000001 /* ShiftFlow.app */,
+				C0000002 /* ShiftFlowWidgetExtension.appex */,
+				C0000003 /* ShiftFlowTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		H0000010 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				B0010001, B0010002, B0010045, B0010050, B0010051,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		H0000011 /* Application */ = {
+			isa = PBXGroup;
+			children = (
+				B0010003, B0010004,
+				B0010005, B0010006, B0010007, B0010008, B0010009,
+			);
+			path = Application;
+			sourceTree = "<group>";
+		};
+		H0000012 /* Notifications */ = {
+			isa = PBXGroup;
+			children = (
+				B0010010, B0010011, B0010012,
+			);
+			path = Notifications;
+			sourceTree = "<group>";
+		};
+		H0000013 /* Persistence */ = {
+			isa = PBXGroup;
+			children = (
+				B0010013,
+				B0010014, B0010015, B0010016, B0010017, B0010018, B0010019, B0010020, B0010021, B0010022,
+			);
+			path = Persistence;
+			sourceTree = "<group>";
+		};
+		H0000014 /* UI */ = {
+			isa = PBXGroup;
+			children = (
+				B0010023, B0010024, B0010025, B0010026, B0010027, B0010028,
+				B0010029, B0010030, B0010031, B0010032, B0010033, B0010034, B0010035, B0010036, B0010037, B0010038,
+				B0010039, B0010040, B0010041, B0010042, B0010043,
+			);
+			path = UI;
+			sourceTree = "<group>";
+		};
+		H0000015 /* Widget */ = {
+			isa = PBXGroup;
+			children = (
+				B0020001, B0020002, B0020003, B0020004,
+				B0020005, B0020006, B0020007, B0020008, B0020009,
+				B0010044,
+				B0020050, B0020051,
+			);
+			path = Widget;
+			sourceTree = "<group>";
+		};
+		H0000016 /* Tests */ = {
+			isa = PBXGroup;
+			children = (
+				B0030001,
+				B0030002, B0030003, B0030004, B0030005, B0030006, B0030007, B0030008, B0030009,
+				B0030010, B0030011, B0030012, B0030013, B0030014, B0030015, B0030016, B0030017, B0030018,
+			);
+			path = Tests;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		C0000000 /* ShiftFlow */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = L0000001 /* Build configuration list for ShiftFlow */;
+			buildPhases = (
+				I0000001 /* Sources */,
+				G0000001 /* Frameworks */,
+				J0000001 /* Resources */,
+				F0000001 /* Embed Foundation Extensions */,
+			);
+			buildRules = ();
+			dependencies = (
+				K0000001 /* Widget dependency */,
+			);
+			name = ShiftFlow;
+			packageProductDependencies = (
+				P0000001 /* ShiftFlowDomain */,
+			);
+			productName = ShiftFlow;
+			productReference = C0000001 /* ShiftFlow.app */;
+			productType = "com.apple.product-type.application";
+		};
+		C0000001T /* ShiftFlowWidgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = L0000002 /* Build configuration list for Widget */;
+			buildPhases = (
+				I0000002 /* Sources */,
+				G0000002 /* Frameworks */,
+				J0000002 /* Resources */,
+			);
+			buildRules = ();
+			dependencies = ();
+			name = ShiftFlowWidgetExtension;
+			packageProductDependencies = (
+				P0000002 /* ShiftFlowDomain */,
+			);
+			productName = ShiftFlowWidgetExtension;
+			productReference = C0000002 /* ShiftFlowWidgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		C0000002T /* ShiftFlowTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = L0000003 /* Build configuration list for Tests */;
+			buildPhases = (
+				I0000003 /* Sources */,
+				G0000003 /* Frameworks */,
+			);
+			buildRules = ();
+			dependencies = (
+				K0000002 /* App dependency */,
+			);
+			name = ShiftFlowTests;
+			packageProductDependencies = (
+				P0000003 /* ShiftFlowDomain */,
+			);
+			productName = ShiftFlowTests;
+			productReference = C0000003 /* ShiftFlowTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		E0000001 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1500;
+				LastUpgradeCheck = 1500;
+				TargetAttributes = {
+					C0000000 = { CreatedOnToolsVersion = 15.0; };
+					C0000001T = { CreatedOnToolsVersion = 15.0; };
+					C0000002T = { CreatedOnToolsVersion = 15.0; TestTargetID = C0000000; };
+				};
+			};
+			buildConfigurationList = L0000000 /* Build configuration list for Project */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (en, Base, vi, );
+			mainGroup = H0000000 /* Root */;
+			packageReferences = (
+				P1000001 /* XCLocalSwiftPackageReference "ShiftFlowDomain" */,
+			);
+			productRefGroup = H0000090 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				C0000000 /* ShiftFlow */,
+				C0000001T /* ShiftFlowWidgetExtension */,
+				C0000002T /* ShiftFlowTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		J0000001 /* Resources (App) */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A0010045 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		J0000002 /* Resources (Widget) */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A0020010 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		I0000001 /* Sources (App) */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A0010001, A0010002, A0010003, A0010004, A0010005, A0010006, A0010007, A0010008, A0010009,
+				A0010010, A0010011, A0010012, A0010013, A0010014, A0010015, A0010016, A0010017, A0010018,
+				A0010019, A0010020, A0010021, A0010022, A0010023, A0010024, A0010025, A0010026, A0010027,
+				A0010028, A0010029, A0010030, A0010031, A0010032, A0010033, A0010034, A0010035, A0010036,
+				A0010037, A0010038, A0010039, A0010040, A0010041, A0010042, A0010043, A0010044,
+				A0010048,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		I0000002 /* Sources (Widget) */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A0020001, A0020002, A0020003, A0020004, A0020005, A0020006, A0020007, A0020008, A0020009,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		I0000003 /* Sources (Tests) */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A0030001, A0030002, A0030003, A0030004, A0030005, A0030006, A0030007, A0030008, A0030009,
+				A0030010, A0030011, A0030012, A0030013, A0030014, A0030015, A0030016, A0030017, A0030018,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		K0000001 /* Widget dependency */ = {
+			isa = PBXTargetDependency;
+			target = C0000001T /* ShiftFlowWidgetExtension */;
+			targetProxy = D0000001 /* PBXContainerItemProxy */;
+		};
+		K0000002 /* App dependency */ = {
+			isa = PBXTargetDependency;
+			target = C0000000 /* ShiftFlow */;
+			targetProxy = D0000002 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		M0000001 /* Debug (Project) */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_TESTABILITY = YES;
+			};
+			name = Debug;
+		};
+		M0000002 /* Release (Project) */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		N0010001 /* Debug (App) */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = App/ShiftFlow.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = App/Info.plist;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				MARKETING_VERSION = 0.9.2;
+				PRODUCT_BUNDLE_IDENTIFIER = com.shiftflow.app;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		N0010002 /* Release (App) */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = App/ShiftFlow.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = App/Info.plist;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				MARKETING_VERSION = 0.9.2;
+				PRODUCT_BUNDLE_IDENTIFIER = com.shiftflow.app;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		N0020001 /* Debug (Widget) */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = Widget/ShiftFlowWidget.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Widget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = ShiftFlow;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				MARKETING_VERSION = 0.9.2;
+				PRODUCT_BUNDLE_IDENTIFIER = com.shiftflow.app.widget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		N0020002 /* Release (Widget) */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = Widget/ShiftFlowWidget.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Widget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = ShiftFlow;
+				MARKETING_VERSION = 0.9.2;
+				PRODUCT_BUNDLE_IDENTIFIER = com.shiftflow.app.widget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		N0030001 /* Debug (Tests) */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 0.9.2;
+				PRODUCT_BUNDLE_IDENTIFIER = com.shiftflow.app.tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ShiftFlow.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/ShiftFlow";
+			};
+			name = Debug;
+		};
+		N0030002 /* Release (Tests) */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 0.9.2;
+				PRODUCT_BUNDLE_IDENTIFIER = com.shiftflow.app.tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ShiftFlow.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/ShiftFlow";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		L0000000 /* Build configuration list for Project */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = ( M0000001 /* Debug */, M0000002 /* Release */, );
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		L0000001 /* Build configuration list for ShiftFlow */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = ( N0010001 /* Debug */, N0010002 /* Release */, );
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		L0000002 /* Build configuration list for Widget */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = ( N0020001 /* Debug */, N0020002 /* Release */, );
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		L0000003 /* Build configuration list for Tests */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = ( N0030001 /* Debug */, N0030002 /* Release */, );
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		P1000001 /* XCLocalSwiftPackageReference "ShiftFlowDomain" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ShiftFlowDomain;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		P0000001 /* ShiftFlowDomain */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = ShiftFlowDomain;
+		};
+		P0000002 /* ShiftFlowDomain */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = ShiftFlowDomain;
+		};
+		P0000003 /* ShiftFlowDomain */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = ShiftFlowDomain;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = E0000001 /* Project object */;
+}

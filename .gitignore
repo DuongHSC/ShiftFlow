@@ -1,0 +1,35 @@
+# ShiftFlow — repository ignore rules
+# TASK-GITHUB-ACTIONS-001: keep build artifacts and machine-local files out of git.
+
+# macOS
+.DS_Store
+
+# Xcode / build output
+build/
+DerivedData/
+*.xcresult
+*.log
+*.moved-aside
+*.hmap
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# Xcode user-specific state (keep shared schemes tracked)
+xcuserdata/
+*.xcuserstate
+*.xcscmblueprint
+
+# Swift Package Manager
+.build/
+.swiftpm/
+Packages/
+Package.resolved
+
+# Node (not used by this project, guarded anyway)
+node_modules/
+
+# Fastlane / signing (not used, but never commit secrets)
+*.mobileprovision
+*.p12
+*.cer
