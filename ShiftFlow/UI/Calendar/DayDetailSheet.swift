@@ -81,28 +81,56 @@ struct DayDetailSheet: View {
     private var shiftSection: some View {
         Section("Ca làm việc") {
             ForEach(shiftCodes, id: \.self) { code in
-                Button {
-                    viewModel.selectShift(code)
-                } label: {
-                    HStack {
-                        Text(code)
-                            .font(.body)
-                            .fontWeight(.medium)
-                            .foregroundStyle(code == "OFF" ? .secondary : ShiftStyle.foregroundColor(for: code))
-
-                        Spacer()
-
-                        if viewModel.selectedShiftCode == code ||
-                           (code == "OFF" && viewModel.selectedShiftCode == nil && viewModel.hasUnsavedChanges) {
-                            Image(systemName: "checkmark")
-                                .foregroundStyle(.accentColor)
-                        }
-                    }
-                }
-                .accessibilityLabel("Ca \(code)")
-                .accessibilityAddTraits(viewModel.selectedShiftCode == code ? .isSelected : [])
+                shiftRow(for: code)
             }
         }
+    }
+
+    // Extracted from the ForEach body to keep each sub-expression small enough
+    // for the Swift type-checker (fixes "unable to type-check in reasonable time").
+    // UI and behavior are unchanged.
+    @ViewBuilder
+    private func shiftRow(for code: String) -> some View {
+        Button {
+            viewModel.selectShift(code)
+        } label: {
+            HStack {
+                Text(code)
+                    .font(.body)
+                    .fontWeight(.medium)
+                    .foregroundStyle(shiftLabelColor(for: code))
+
+                Spacer()
+
+                if shouldShowCheckmark(for: code) {
+                    Image(systemName: "checkmark")
+                        .foregroundStyle(Color.accentColor)
+                }
+            }
+        }
+        .accessibilityLabel("Ca \(code)")
+        .accessibilityAddTraits(selectionTraits(for: code))
+    }
+
+    /// Foreground color for a shift code label (OFF is de-emphasized).
+    private func shiftLabelColor(for code: String) -> Color {
+        code == "OFF" ? Color.secondary : ShiftStyle.foregroundColor(for: code)
+    }
+
+    /// Whether the selected-state checkmark should appear for a code.
+    /// OFF is checked when no shift is selected but there are unsaved changes.
+    private func shouldShowCheckmark(for code: String) -> Bool {
+        if viewModel.selectedShiftCode == code {
+            return true
+        }
+        return code == "OFF"
+            && viewModel.selectedShiftCode == nil
+            && viewModel.hasUnsavedChanges
+    }
+
+    /// Accessibility traits reflecting the selected state for a code.
+    private func selectionTraits(for code: String) -> AccessibilityTraits {
+        viewModel.selectedShiftCode == code ? .isSelected : []
     }
 
     @ViewBuilder
