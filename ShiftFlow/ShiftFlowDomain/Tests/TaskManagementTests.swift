@@ -6,9 +6,17 @@
 // Verifies TaskDefinition/WorkDayTask, MW independence from shift times,
 // historical snapshot protection, note independence, import/export,
 // reminder independence, widget indicator, and seeding.
+//
+// TASK-GITHUB-ACTIONS-FIX-004 (module visibility): this file references
+// ReminderOffset (reminder-independence assertions), which lives in the ShiftFlow
+// app module (Notifications/ReminderModels.swift), not the domain package. It
+// therefore imports the app module in addition to the domain module and is
+// compiled by the app-hosted `ShiftFlowTests` Xcode target (excluded from the
+// standalone `ShiftFlowDomain` SPM test target — see Package.swift).
 
 import XCTest
 @testable import ShiftFlowDomain
+@testable import ShiftFlow
 
 final class TaskManagementTests: XCTestCase {
 

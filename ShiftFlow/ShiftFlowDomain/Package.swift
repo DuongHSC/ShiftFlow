@@ -44,7 +44,9 @@ let package = Package(
                 "TaskSettingsViewModelTests.swift",
                 "ShiftSettingsTests.swift",
                 "ReminderTests.swift",
-                "PolishTests.swift"
+                "PolishTests.swift",
+                "IntegrationTests.swift",
+                "TaskManagementTests.swift"
             ]
         )
     ]
