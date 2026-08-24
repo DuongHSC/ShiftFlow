@@ -30,6 +30,10 @@ public enum WidgetDeepLink {
         let formatter = DateFormatter()
         formatter.dateFormat = dateFormat
         formatter.calendar = calendar
+        // Format in the calendar's own time zone. WorkDay dates are local-midnight
+        // values in that zone; without this the system zone (UTC on CI) shifts the
+        // rendered yyyy-MM-dd to the previous day. Keeps deep-link round-trip stable.
+        formatter.timeZone = calendar.timeZone
         let dateString = formatter.string(from: date)
 
         var components = URLComponents()
@@ -66,6 +70,8 @@ public enum WidgetDeepLink {
         let formatter = DateFormatter()
         formatter.dateFormat = dateFormat
         formatter.calendar = calendar
+        // Parse in the same time zone used to format (symmetric round-trip).
+        formatter.timeZone = calendar.timeZone
         return formatter.date(from: dateString)
     }
 }
