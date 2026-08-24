@@ -126,84 +126,84 @@
 		C0000003 /* ShiftFlowTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ShiftFlowTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C0000010 /* ShiftFlowDomain */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = ShiftFlowDomain; sourceTree = "<group>"; };
 
-		B0010001 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShiftFlowApp.swift; sourceTree = "<group>"; };
-		B0010002 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
-		B0010003 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppContainer.swift; sourceTree = "<group>"; };
-		B0010004 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShiftDefinitionProvider.swift; sourceTree = "<group>"; };
-		B0010005 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarViewModel.swift; sourceTree = "<group>"; };
-		B0010006 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataManagementViewModel.swift; sourceTree = "<group>"; };
-		B0010007 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayDetailViewModel.swift; sourceTree = "<group>"; };
-		B0010008 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShiftSettingsViewModel.swift; sourceTree = "<group>"; };
-		B0010009 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskSettingsViewModel.swift; sourceTree = "<group>"; };
-		B0010010 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
-		B0010011 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReminderModels.swift; sourceTree = "<group>"; };
-		B0010012 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReminderService.swift; sourceTree = "<group>"; };
-		B0010013 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudSyncService.swift; sourceTree = "<group>"; };
-		B0010014 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceContainer.swift; sourceTree = "<group>"; };
-		B0010015 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleRuleModel.swift; sourceTree = "<group>"; };
-		B0010016 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShiftDefinitionModel.swift; sourceTree = "<group>"; };
-		B0010017 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftDataShiftConfigurationStore.swift; sourceTree = "<group>"; };
-		B0010018 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftDataTaskStore.swift; sourceTree = "<group>"; };
-		B0010019 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftDataWorkDayRepository.swift; sourceTree = "<group>"; };
-		B0010020 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskDefinitionModel.swift; sourceTree = "<group>"; };
-		B0010021 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkDayModel.swift; sourceTree = "<group>"; };
-		B0010022 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkDayTaskModel.swift; sourceTree = "<group>"; };
-		B0010023 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarScreen.swift; sourceTree = "<group>"; };
-		B0010024 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayDetailSheet.swift; sourceTree = "<group>"; };
-		B0010025 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonthView.swift; sourceTree = "<group>"; };
-		B0010026 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThreeDaysView.swift; sourceTree = "<group>"; };
-		B0010027 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayView.swift; sourceTree = "<group>"; };
-		B0010028 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeekView.swift; sourceTree = "<group>"; };
-		B0010029 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSVExportView.swift; sourceTree = "<group>"; };
-		B0010030 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSVFileWriter.swift; sourceTree = "<group>"; };
-		B0010031 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSVImportPreviewView.swift; sourceTree = "<group>"; };
-		B0010032 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSVImportView.swift; sourceTree = "<group>"; };
-		B0010033 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataManagementView.swift; sourceTree = "<group>"; };
-		B0010034 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleRuleEditView.swift; sourceTree = "<group>"; };
-		B0010035 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsScreen.swift; sourceTree = "<group>"; };
-		B0010036 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShiftEditView.swift; sourceTree = "<group>"; };
-		B0010037 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskDefinitionEditView.swift; sourceTree = "<group>"; };
-		B0010038 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskSettingsView.swift; sourceTree = "<group>"; };
-		B0010039 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessibilityLabelBuilder.swift; sourceTree = "<group>"; };
-		B0010040 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignConstants.swift; sourceTree = "<group>"; };
-		B0010041 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShiftStyle.swift; sourceTree = "<group>"; };
-		B0010042 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeFormatter.swift; sourceTree = "<group>"; };
-		B0010043 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeekdayFormatter.swift; sourceTree = "<group>"; };
-		B0010044 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppGroupWidgetSnapshotSink.swift; sourceTree = "<group>"; };
-		B0010045 = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		B0010050 = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		B0010051 = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ShiftFlow.entitlements; sourceTree = "<group>"; };
+		B0010001 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App/ShiftFlowApp.swift; sourceTree = SOURCE_ROOT; };
+		B0010002 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App/ContentView.swift; sourceTree = SOURCE_ROOT; };
+		B0010003 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Application/AppContainer.swift; sourceTree = SOURCE_ROOT; };
+		B0010004 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Application/Services/ShiftDefinitionProvider.swift; sourceTree = SOURCE_ROOT; };
+		B0010005 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Application/ViewModels/CalendarViewModel.swift; sourceTree = SOURCE_ROOT; };
+		B0010006 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Application/ViewModels/DataManagementViewModel.swift; sourceTree = SOURCE_ROOT; };
+		B0010007 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Application/ViewModels/DayDetailViewModel.swift; sourceTree = SOURCE_ROOT; };
+		B0010008 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Application/ViewModels/ShiftSettingsViewModel.swift; sourceTree = SOURCE_ROOT; };
+		B0010009 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Application/ViewModels/TaskSettingsViewModel.swift; sourceTree = SOURCE_ROOT; };
+		B0010010 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Notifications/NotificationService.swift; sourceTree = SOURCE_ROOT; };
+		B0010011 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Notifications/ReminderModels.swift; sourceTree = SOURCE_ROOT; };
+		B0010012 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Notifications/ReminderService.swift; sourceTree = SOURCE_ROOT; };
+		B0010013 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Persistence/CloudKit/CloudSyncService.swift; sourceTree = SOURCE_ROOT; };
+		B0010014 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Persistence/SwiftData/PersistenceContainer.swift; sourceTree = SOURCE_ROOT; };
+		B0010015 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Persistence/SwiftData/ScheduleRuleModel.swift; sourceTree = SOURCE_ROOT; };
+		B0010016 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Persistence/SwiftData/ShiftDefinitionModel.swift; sourceTree = SOURCE_ROOT; };
+		B0010017 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Persistence/SwiftData/SwiftDataShiftConfigurationStore.swift; sourceTree = SOURCE_ROOT; };
+		B0010018 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Persistence/SwiftData/SwiftDataTaskStore.swift; sourceTree = SOURCE_ROOT; };
+		B0010019 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Persistence/SwiftData/SwiftDataWorkDayRepository.swift; sourceTree = SOURCE_ROOT; };
+		B0010020 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Persistence/SwiftData/TaskDefinitionModel.swift; sourceTree = SOURCE_ROOT; };
+		B0010021 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Persistence/SwiftData/WorkDayModel.swift; sourceTree = SOURCE_ROOT; };
+		B0010022 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Persistence/SwiftData/WorkDayTaskModel.swift; sourceTree = SOURCE_ROOT; };
+		B0010023 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UI/Calendar/CalendarScreen.swift; sourceTree = SOURCE_ROOT; };
+		B0010024 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UI/Calendar/DayDetailSheet.swift; sourceTree = SOURCE_ROOT; };
+		B0010025 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UI/Calendar/MonthView.swift; sourceTree = SOURCE_ROOT; };
+		B0010026 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UI/Calendar/ThreeDaysView.swift; sourceTree = SOURCE_ROOT; };
+		B0010027 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UI/Calendar/TodayView.swift; sourceTree = SOURCE_ROOT; };
+		B0010028 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UI/Calendar/WeekView.swift; sourceTree = SOURCE_ROOT; };
+		B0010029 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UI/Settings/CSVExportView.swift; sourceTree = SOURCE_ROOT; };
+		B0010030 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UI/Settings/CSVFileWriter.swift; sourceTree = SOURCE_ROOT; };
+		B0010031 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UI/Settings/CSVImportPreviewView.swift; sourceTree = SOURCE_ROOT; };
+		B0010032 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UI/Settings/CSVImportView.swift; sourceTree = SOURCE_ROOT; };
+		B0010033 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UI/Settings/DataManagementView.swift; sourceTree = SOURCE_ROOT; };
+		B0010034 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UI/Settings/ScheduleRuleEditView.swift; sourceTree = SOURCE_ROOT; };
+		B0010035 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UI/Settings/SettingsScreen.swift; sourceTree = SOURCE_ROOT; };
+		B0010036 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UI/Settings/ShiftEditView.swift; sourceTree = SOURCE_ROOT; };
+		B0010037 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UI/Settings/TaskDefinitionEditView.swift; sourceTree = SOURCE_ROOT; };
+		B0010038 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UI/Settings/TaskSettingsView.swift; sourceTree = SOURCE_ROOT; };
+		B0010039 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UI/Shared/AccessibilityLabelBuilder.swift; sourceTree = SOURCE_ROOT; };
+		B0010040 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UI/Shared/DesignConstants.swift; sourceTree = SOURCE_ROOT; };
+		B0010041 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UI/Shared/ShiftStyle.swift; sourceTree = SOURCE_ROOT; };
+		B0010042 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UI/Shared/TimeFormatter.swift; sourceTree = SOURCE_ROOT; };
+		B0010043 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UI/Shared/WeekdayFormatter.swift; sourceTree = SOURCE_ROOT; };
+		B0010044 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Widget/Services/AppGroupWidgetSnapshotSink.swift; sourceTree = SOURCE_ROOT; };
+		B0010045 = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = App/Assets.xcassets; sourceTree = SOURCE_ROOT; };
+		B0010050 = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = App/Info.plist; sourceTree = SOURCE_ROOT; };
+		B0010051 = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = App/ShiftFlow.entitlements; sourceTree = SOURCE_ROOT; };
 
-		B0020001 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShiftFlowWidget.swift; sourceTree = "<group>"; };
-		B0020002 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShiftFlowWidgetBundle.swift; sourceTree = "<group>"; };
-		B0020003 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShiftFlowTimelineProvider.swift; sourceTree = "<group>"; };
-		B0020004 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetDataProvider.swift; sourceTree = "<group>"; };
-		B0020005 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShiftFlowWidgetView.swift; sourceTree = "<group>"; };
-		B0020006 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmallWidgetView.swift; sourceTree = "<group>"; };
-		B0020007 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediumWidgetView.swift; sourceTree = "<group>"; };
-		B0020008 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LargeWidgetView.swift; sourceTree = "<group>"; };
-		B0020009 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetFormatting.swift; sourceTree = "<group>"; };
-		B0020050 = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		B0020051 = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ShiftFlowWidget.entitlements; sourceTree = "<group>"; };
+		B0020001 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Widget/ShiftFlowWidget.swift; sourceTree = SOURCE_ROOT; };
+		B0020002 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Widget/ShiftFlowWidgetBundle.swift; sourceTree = SOURCE_ROOT; };
+		B0020003 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Widget/Providers/ShiftFlowTimelineProvider.swift; sourceTree = SOURCE_ROOT; };
+		B0020004 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Widget/Services/WidgetDataProvider.swift; sourceTree = SOURCE_ROOT; };
+		B0020005 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Widget/Views/ShiftFlowWidgetView.swift; sourceTree = SOURCE_ROOT; };
+		B0020006 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Widget/Views/SmallWidgetView.swift; sourceTree = SOURCE_ROOT; };
+		B0020007 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Widget/Views/MediumWidgetView.swift; sourceTree = SOURCE_ROOT; };
+		B0020008 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Widget/Views/LargeWidgetView.swift; sourceTree = SOURCE_ROOT; };
+		B0020009 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Widget/Views/WidgetFormatting.swift; sourceTree = SOURCE_ROOT; };
+		B0020050 = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Widget/Info.plist; sourceTree = SOURCE_ROOT; };
+		B0020051 = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Widget/ShiftFlowWidget.entitlements; sourceTree = SOURCE_ROOT; };
 
-		B0030001 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShiftFlowTests.swift; sourceTree = "<group>"; };
-		B0030002 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarViewModelTests.swift; sourceTree = "<group>"; };
-		B0030003 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitSyncTests.swift; sourceTree = "<group>"; };
-		B0030004 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataManagementViewModelTests.swift; sourceTree = "<group>"; };
-		B0030005 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InMemoryWorkDayRepository.swift; sourceTree = "<group>"; };
-		B0030006 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntegrationTests.swift; sourceTree = "<group>"; };
-		B0030007 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceMappingTests.swift; sourceTree = "<group>"; };
-		B0030008 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PolishTests.swift; sourceTree = "<group>"; };
-		B0030009 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReminderTests.swift; sourceTree = "<group>"; };
-		B0030010 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShiftImportTests.swift; sourceTree = "<group>"; };
-		B0030011 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShiftResolverTests.swift; sourceTree = "<group>"; };
-		B0030012 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShiftSeedProviderTests.swift; sourceTree = "<group>"; };
-		B0030013 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShiftSettingsTests.swift; sourceTree = "<group>"; };
-		B0030014 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskManagementTests.swift; sourceTree = "<group>"; };
-		B0030015 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskSettingsViewModelTests.swift; sourceTree = "<group>"; };
-		B0030016 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetRefreshIntegrationTests.swift; sourceTree = "<group>"; };
-		B0030017 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetScheduleTests.swift; sourceTree = "<group>"; };
-		B0030018 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkDayServiceTests.swift; sourceTree = "<group>"; };
+		B0030001 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tests/ShiftFlowTests.swift; sourceTree = SOURCE_ROOT; };
+		B0030002 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShiftFlowDomain/Tests/CalendarViewModelTests.swift; sourceTree = SOURCE_ROOT; };
+		B0030003 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShiftFlowDomain/Tests/CloudKitSyncTests.swift; sourceTree = SOURCE_ROOT; };
+		B0030004 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShiftFlowDomain/Tests/DataManagementViewModelTests.swift; sourceTree = SOURCE_ROOT; };
+		B0030005 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShiftFlowDomain/Tests/InMemoryWorkDayRepository.swift; sourceTree = SOURCE_ROOT; };
+		B0030006 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShiftFlowDomain/Tests/IntegrationTests.swift; sourceTree = SOURCE_ROOT; };
+		B0030007 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShiftFlowDomain/Tests/PersistenceMappingTests.swift; sourceTree = SOURCE_ROOT; };
+		B0030008 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShiftFlowDomain/Tests/PolishTests.swift; sourceTree = SOURCE_ROOT; };
+		B0030009 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShiftFlowDomain/Tests/ReminderTests.swift; sourceTree = SOURCE_ROOT; };
+		B0030010 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShiftFlowDomain/Tests/ShiftImportTests.swift; sourceTree = SOURCE_ROOT; };
+		B0030011 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShiftFlowDomain/Tests/ShiftResolverTests.swift; sourceTree = SOURCE_ROOT; };
+		B0030012 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShiftFlowDomain/Tests/ShiftSeedProviderTests.swift; sourceTree = SOURCE_ROOT; };
+		B0030013 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShiftFlowDomain/Tests/ShiftSettingsTests.swift; sourceTree = SOURCE_ROOT; };
+		B0030014 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShiftFlowDomain/Tests/TaskManagementTests.swift; sourceTree = SOURCE_ROOT; };
+		B0030015 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShiftFlowDomain/Tests/TaskSettingsViewModelTests.swift; sourceTree = SOURCE_ROOT; };
+		B0030016 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShiftFlowDomain/Tests/WidgetRefreshIntegrationTests.swift; sourceTree = SOURCE_ROOT; };
+		B0030017 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShiftFlowDomain/Tests/WidgetScheduleTests.swift; sourceTree = SOURCE_ROOT; };
+		B0030018 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShiftFlowDomain/Tests/WorkDayServiceTests.swift; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -264,7 +264,7 @@
 			children = (
 				B0010001, B0010002, B0010045, B0010050, B0010051,
 			);
-			path = App;
+			name = App;
 			sourceTree = "<group>";
 		};
 		H0000011 /* Application */ = {
@@ -273,7 +273,7 @@
 				B0010003, B0010004,
 				B0010005, B0010006, B0010007, B0010008, B0010009,
 			);
-			path = Application;
+			name = Application;
 			sourceTree = "<group>";
 		};
 		H0000012 /* Notifications */ = {
@@ -281,7 +281,7 @@
 			children = (
 				B0010010, B0010011, B0010012,
 			);
-			path = Notifications;
+			name = Notifications;
 			sourceTree = "<group>";
 		};
 		H0000013 /* Persistence */ = {
@@ -290,7 +290,7 @@
 				B0010013,
 				B0010014, B0010015, B0010016, B0010017, B0010018, B0010019, B0010020, B0010021, B0010022,
 			);
-			path = Persistence;
+			name = Persistence;
 			sourceTree = "<group>";
 		};
 		H0000014 /* UI */ = {
@@ -300,7 +300,7 @@
 				B0010029, B0010030, B0010031, B0010032, B0010033, B0010034, B0010035, B0010036, B0010037, B0010038,
 				B0010039, B0010040, B0010041, B0010042, B0010043,
 			);
-			path = UI;
+			name = UI;
 			sourceTree = "<group>";
 		};
 		H0000015 /* Widget */ = {
@@ -311,7 +311,7 @@
 				B0010044,
 				B0020050, B0020051,
 			);
-			path = Widget;
+			name = Widget;
 			sourceTree = "<group>";
 		};
 		H0000016 /* Tests */ = {
@@ -321,7 +321,7 @@
 				B0030002, B0030003, B0030004, B0030005, B0030006, B0030007, B0030008, B0030009,
 				B0030010, B0030011, B0030012, B0030013, B0030014, B0030015, B0030016, B0030017, B0030018,
 			);
-			path = Tests;
+			name = Tests;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
