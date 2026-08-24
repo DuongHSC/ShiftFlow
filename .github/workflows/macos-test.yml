@@ -122,20 +122,26 @@ jobs:
             | tee build.log
 
       # ----------------------------------------------------------------------
-      # 7b. Diagnostic: surface the FIRST xcodebuild errors in the Actions log.
-      #     Runs ONLY when a previous step failed (build failure). It never
-      #     fails on its own (no matches is fine) and never hides the original
-      #     build failure — the job stays FAILED. No build commands changed.
+      # 7b. Diagnostic: surface the actual xcodebuild failure in the Actions log.
+      #     Runs ONLY when a previous step failed (build failure). It always
+      #     exits successfully and never hides the original build failure —
+      #     the job stays FAILED. No build commands changed.
       # ----------------------------------------------------------------------
-      - name: Show first build errors (on failure)
+      - name: Show build failure details (on failure)
         if: ${{ failure() }}
         run: |
+          echo "===== BUILD LOG STATUS ====="
           if [ -f build.log ]; then
-            echo "===== FIRST XCODEBUILD ERRORS ====="
-            grep -n -E '(^|[[:space:]])error:|BUILD FAILED|CodeSign|Provisioning|No such module|Undefined symbols|CompileSwift' build.log | head -n 30 || true
-            echo "===== END FIRST XCODEBUILD ERRORS ====="
+            wc -c build.log
+            wc -l build.log
+            echo "===== LAST 200 LINES ====="
+            tail -n 200 build.log
+            echo "===== ERROR MATCHES ====="
+            grep -n -E 'error:|fatal error:|BUILD FAILED|CodeSign|codesign|Provisioning|No such module|Undefined symbols|SwiftCompile|CompileSwift|Ld |PhaseScriptExecution' build.log | tail -n 100 || true
+            echo "===== END BUILD FAILURE DETAILS ====="
           else
-            echo "build.log not found"
+            echo "build.log NOT FOUND"
+            echo "===== END BUILD FAILURE DETAILS ====="
           fi
 
       # ----------------------------------------------------------------------
