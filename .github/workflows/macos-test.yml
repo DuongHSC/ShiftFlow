@@ -122,6 +122,23 @@ jobs:
             | tee build.log
 
       # ----------------------------------------------------------------------
+      # 7b. Diagnostic: surface the FIRST xcodebuild errors in the Actions log.
+      #     Runs ONLY when a previous step failed (build failure). It never
+      #     fails on its own (no matches is fine) and never hides the original
+      #     build failure — the job stays FAILED. No build commands changed.
+      # ----------------------------------------------------------------------
+      - name: Show first build errors (on failure)
+        if: ${{ failure() }}
+        run: |
+          if [ -f build.log ]; then
+            echo "===== FIRST XCODEBUILD ERRORS ====="
+            grep -n -E '(^|[[:space:]])error:|BUILD FAILED|CodeSign|Provisioning|No such module|Undefined symbols|CompileSwift' build.log | head -n 30 || true
+            echo "===== END FIRST XCODEBUILD ERRORS ====="
+          else
+            echo "build.log not found"
+          fi
+
+      # ----------------------------------------------------------------------
       # 8. Run the full test suite on the Simulator
       #    Uses the already-built products (test-without-building) and writes an
       #    .xcresult bundle for artifact upload.
