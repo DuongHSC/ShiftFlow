@@ -18,8 +18,16 @@
 // - Notification identifier format
 // - Permission handling
 
+// TASK-GITHUB-ACTIONS-FIX-004 (module visibility): ReminderOffset,
+// ReminderConfiguration, and ReminderIdentifier live in the ShiftFlow app module
+// (Notifications/ReminderModels.swift), not the domain package. This file is
+// compiled by the app-hosted `ShiftFlowTests` Xcode target, so it imports the app
+// module in addition to the domain module. It is excluded from the standalone
+// `ShiftFlowDomain` SPM test target (see Package.swift).
+
 import XCTest
 @testable import ShiftFlowDomain
+@testable import ShiftFlow
 
 // Since we cannot import UserNotifications in the domain test target on Windows,
 // these tests verify the reminder LOGIC (offset calculations, identifiers,

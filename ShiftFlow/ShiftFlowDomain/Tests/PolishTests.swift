@@ -8,9 +8,17 @@
 // and that no technical error detail leaks to users.
 //
 // UI rendering, Dark Mode, and Dynamic Type are verified physically on macOS.
+//
+// TASK-GITHUB-ACTIONS-FIX-004 (module visibility): WeekdayFormatter and
+// AccessibilityLabelBuilder live in the ShiftFlow app module (UI/Shared/), not
+// the domain package. This file is compiled by the app-hosted `ShiftFlowTests`
+// Xcode target, so it imports the app module in addition to the domain module.
+// It is excluded from the standalone `ShiftFlowDomain` SPM test target
+// (see Package.swift).
 
 import XCTest
 @testable import ShiftFlowDomain
+@testable import ShiftFlow
 
 final class PolishTests: XCTestCase {
 
