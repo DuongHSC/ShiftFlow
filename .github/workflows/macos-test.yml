@@ -113,12 +113,18 @@ jobs:
       - name: Build ShiftFlow (app + widget)
         run: |
           set -euxo pipefail
+          # DISABLE_CLOUDKIT compiles out the CloudKit branch in
+          # PersistenceConfiguration.makeContainer for this unsigned Simulator
+          # build (no iCloud entitlement), so the app uses the local SwiftData
+          # store and does not trap in CloudKit at launch. Signed production
+          # builds are built WITHOUT this flag and keep full CloudKit sync.
           xcodebuild build-for-testing \
             -project "$PROJECT" \
             -scheme "$SCHEME" \
             -configuration Debug \
             -destination "id=${{ steps.sim.outputs.udid }}" \
             CODE_SIGNING_ALLOWED=NO \
+            SWIFT_ACTIVE_COMPILATION_CONDITIONS='$(inherited) DISABLE_CLOUDKIT' \
             | tee build.log
 
       # ----------------------------------------------------------------------
