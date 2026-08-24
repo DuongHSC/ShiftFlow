@@ -111,7 +111,7 @@ final class TaskManagementTests: XCTestCase {
     func testDuplicateTaskCodeRejected() throws {
         let (service, _) = makeTaskService()
         XCTAssertThrowsError(try service.createTask(code: "MW", name: "Dup")) { error in
-            if case TaskError.duplicateCode = (error as? TaskError) {} else { XCTFail() }
+            if case .some(.duplicateCode) = (error as? TaskError) {} else { XCTFail() }
         }
     }
 
@@ -636,7 +636,7 @@ final class TaskManagementTests: XCTestCase {
         try taskService.addTask(taskDefinitionID: mw.id, toWorkDay: workDayID)
 
         XCTAssertThrowsError(try taskService.deleteTask(id: mw.id)) { error in
-            if case TaskError.taskInUse = (error as? TaskError) {} else { XCTFail() }
+            if case .some(.taskInUse) = (error as? TaskError) {} else { XCTFail() }
         }
     }
 

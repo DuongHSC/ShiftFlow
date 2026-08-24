@@ -134,7 +134,7 @@ final class ShiftSettingsTests: XCTestCase {
             breakStartHour: 11, breakStartMinute: 30, breakEndHour: 12, breakEndMinute: 30
         )
         XCTAssertThrowsError(try service.updateShift(collidingCode)) { error in
-            if case ShiftConfigurationError.duplicateCode = (error as? ShiftConfigurationError) {} else {
+            if case .some(.duplicateCode) = (error as? ShiftConfigurationError) {} else {
                 XCTFail("Expected duplicateCode")
             }
         }
