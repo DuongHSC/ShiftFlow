@@ -181,3 +181,106 @@ jobs:
             test.log
           retention-days: 14
           if-no-files-found: warn
+
+  # ==========================================================================
+  # TASK-RELEASE-BUILD-002: Produce a LOCAL-ONLY Release .app artifact for the
+  # iOS Simulator. Unsigned (CODE_SIGNING_ALLOWED=NO) and DISABLE_CLOUDKIT, so
+  # it is Simulator-only and never initializes CloudKit. This job is additive;
+  # it does not change the existing build-and-test job or any product code.
+  # ==========================================================================
+  release-simulator-build:
+    name: Release Simulator Build (.app artifact)
+    runs-on: macos-15
+
+    env:
+      PROJECT: ShiftFlow/ShiftFlow.xcodeproj
+      SCHEME: ShiftFlow
+      DERIVED: DerivedData-Release
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Select latest stable Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+
+      - name: Resolve simulator destination
+        id: sim
+        run: |
+          set -euo pipefail
+          UDID=$(xcrun simctl list devices available | grep -Eo 'iPhone[^(]*\(([0-9A-F-]+)\)' | grep -Eo '[0-9A-F-]{36}' | head -n 1)
+          if [ -z "$UDID" ]; then
+            echo "No iPhone simulator available" >&2
+            xcrun simctl list devices available
+            exit 1
+          fi
+          echo "udid=$UDID" >> "$GITHUB_OUTPUT"
+
+      - name: Build Release (Simulator, unsigned, local-only)
+        run: |
+          set -euxo pipefail
+          # Release configuration; unsigned; CloudKit compiled out (local-only).
+          # Fixed DerivedData path so we can locate ShiftFlow.app deterministically.
+          xcodebuild build \
+            -project "$PROJECT" \
+            -scheme "$SCHEME" \
+            -configuration Release \
+            -destination "id=${{ steps.sim.outputs.udid }}" \
+            -derivedDataPath "$DERIVED" \
+            CODE_SIGNING_ALLOWED=NO \
+            SWIFT_ACTIVE_COMPILATION_CONDITIONS='$(inherited) DISABLE_CLOUDKIT' \
+            | tee release-build.log
+
+      - name: Show release build failure (on failure)
+        if: ${{ failure() }}
+        run: |
+          echo "===== RELEASE BUILD FAILURE ====="
+          if [ -f release-build.log ]; then
+            tail -n 200 release-build.log
+            echo "===== ERROR MATCHES ====="
+            grep -n -E 'error:|fatal error:|BUILD FAILED|CodeSign|Provisioning|No such module|Undefined symbols|Ld ' release-build.log | tail -n 100 || true
+          else
+            echo "release-build.log NOT FOUND"
+          fi
+
+      - name: Locate, verify, and package ShiftFlow.app
+        run: |
+          set -euxo pipefail
+          APP=$(find "$DERIVED/Build/Products" -type d -name 'ShiftFlow.app' | head -n 1)
+          if [ -z "$APP" ]; then
+            echo "ShiftFlow.app not found under $DERIVED/Build/Products" >&2
+            find "$DERIVED/Build/Products" -maxdepth 3 -name '*.app' -o -name '*.appex' || true
+            exit 1
+          fi
+          echo "APP=$APP"
+
+          echo "===== Verify embedded Widget extension ====="
+          APPEX="$APP/PlugIns/ShiftFlowWidgetExtension.appex"
+          test -d "$APPEX" || { echo "Widget extension missing at $APPEX" >&2; ls -la "$APP/PlugIns" || true; exit 1; }
+
+          echo "===== Verify CFBundleIdentifier ====="
+          BID=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$APP/Info.plist")
+          echo "CFBundleIdentifier=$BID"
+          test "$BID" = "com.shiftflow.app" || { echo "Unexpected bundle id: $BID" >&2; exit 1; }
+
+          echo "===== App version ====="
+          /usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$APP/Info.plist" || true
+          /usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' "$APP/Info.plist" || true
+
+          echo "===== Package artifact ====="
+          # Zip the .app preserving its bundle structure.
+          ( cd "$(dirname "$APP")" && ditto -c -k --sequesterRsrc --keepParent "ShiftFlow.app" "$GITHUB_WORKSPACE/ShiftFlow-v0.9.5-Simulator.zip" )
+          ls -la "$GITHUB_WORKSPACE/ShiftFlow-v0.9.5-Simulator.zip"
+
+      - name: Upload Release Simulator artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ShiftFlow-v0.9.5-Simulator
+          path: |
+            ShiftFlow-v0.9.5-Simulator.zip
+            release-build.log
+          retention-days: 14
+          if-no-files-found: warn
