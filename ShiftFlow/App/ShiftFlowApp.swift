@@ -15,9 +15,13 @@ struct ShiftFlowApp: App {
 
     /// The application composition root.
     ///
-    /// Builds the CloudKit-aware ModelContainer (with local fallback) and wires
-    /// all services together. The app remains fully functional offline.
-    @State private var container: AppContainer = AppContainer.makeDefault(useCloudKit: true)
+    /// TASK-LOCAL-ONLY-IMPLEMENT-001: ShiftFlow is an explicitly LOCAL-ONLY
+    /// product. The container is built with `useCloudKit: false`, so the local
+    /// SwiftData store is the sole source of truth and no automatic iCloud/
+    /// CloudKit synchronization is attempted or initialized. CloudKit support
+    /// remains in `PersistenceConfiguration` but is intentionally unused here.
+    /// The app is fully functional offline; manual data transfer is via CSV.
+    @State private var container: AppContainer = AppContainer.makeDefault(useCloudKit: false)
 
     var body: some Scene {
         WindowGroup {
