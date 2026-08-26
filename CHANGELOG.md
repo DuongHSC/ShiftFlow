@@ -291,17 +291,129 @@ A feature is not considered complete without recording relevant test results.
 
 ```text
 Current Version:
-v0.9.4
+v0.9.5
 
 Current Phase:
-macOS CI / GitHub Actions
+macOS CI Stabilization — Green Baseline
 
 Implementation:
-TASK-GITHUB-ACTIONS-001 completed (workflow authored; CI run pending on GitHub macOS runner)
+TASK-GITHUB-ACTIONS-FIX-005..011 completed; CI verified green
+(run 32754956252, commit 1edf536): 507/507 tests pass, 17/17 suites pass,
+build + simulator install/launch pass on Xcode 26.3 / iPhone 16 Pro / iOS 18.5.
 
 Next Phase:
 Awaiting review — not started
 ```
+
+---
+
+## v0.9.5 — macOS CI Stabilization (Green Baseline)
+
+**Date:** 2026-08-24
+
+**Task ID:** TASK-GITHUB-ACTIONS-FIX-005..011, TASK-RELEASE-VERSION-001
+
+**Type:** Bug fixes / CI stabilization (PATCH)
+
+**Status:** Completed — CI Green
+
+### Summary
+
+Stabilized the macOS GitHub Actions pipeline so the full ShiftFlow suite builds,
+installs, launches, and runs on a real iOS Simulator. Fixes span CloudKit gating
+for unsigned CI builds, Xcode project file references, a SwiftUI type-checking
+timeout, date/time timezone handling, and one test-baseline correction. Result:
+a verified green baseline of **507/507 tests passing, 17/17 suites, 0 failures**.
+
+### Reason
+
+After the real Xcode project was created (v0.9.2) and CI authored (v0.9.4),
+running on the GitHub macOS runner surfaced a sequence of build/runtime/test
+defects that were not observable on the Windows authoring host. Each was fixed
+at the root cause without changing product behavior.
+
+### Version Justification
+
+v0.9.5 (PATCH) — bug fixes and CI/config stabilization only; no new feature,
+no product-behavior change, no architecture change. Prior version was v0.9.4.
+
+### Changes
+
+- **CloudKit entitlement / unsigned CI fallback.** SwiftData+CloudKit container
+  initialization trapped at launch on the unsigned CI simulator build (missing
+  `com.apple.developer.icloud-services`). Gated CloudKit behind a compile-time
+  `DISABLE_CLOUDKIT` flag (set only for the unsigned CI build via
+  `SWIFT_ACTIVE_COMPILATION_CONDITIONS`); signed builds keep full CloudKit sync.
+  The documented offline-first local SwiftData store is used when gated.
+- **Xcode project / file-reference fixes.** Corrected `project.pbxproj` source
+  paths so Widget and app/test files resolve (full `SOURCE_ROOT`-relative paths);
+  removed a duplicate `ScheduleRule.swift` producer; resolved test-target module
+  visibility by adding `@testable import ShiftFlow` to app-layer-dependent test
+  files and excluding them from the standalone SPM test target; added
+  `CFBundleIdentifier` to the app/widget Info.plist.
+- **SwiftUI type-checking fix.** Broke up an over-complex expression in
+  `DayDetailSheet` (shift row) into typed helpers to resolve
+  "unable to type-check this expression in reasonable time."
+- **Export/import/date timezone stabilization.** Aligned `DateFormatter.timeZone`
+  to the calendar's time zone in `ShiftExportService`, `ImportValidator`, and
+  `ShiftImportService`, and added calendar-aware `TimeFormatter` used by
+  `AccessibilityLabelBuilder`, fixing dates rendering one day early and
+  round-trip/label shifts under the UTC CI runner.
+- **WidgetDeepLink timezone fix.** Set `formatter.timeZone = calendar.timeZone`
+  in `WidgetDeepLink.url(forDate:)` and `parseDate(from:)` to preserve the
+  calendar day in `shiftflow://day?date=yyyy-MM-dd` round-trips.
+- **Repeated widget-refresh test baseline correction.** `testRepeatedRefreshDoesNotCorruptSnapshot`
+  now captures its baseline from an explicit `refresh(referenceDate:)` rather than
+  the create-triggered (real-today) publish, verifying the intended invariant that
+  repeated refreshes with the same reference date are identical. Production widget
+  behavior unchanged.
+- **GitHub Actions macOS CI stabilization.** Workflow YAML/diagnostic corrections
+  so the pipeline reaches and completes test execution reliably.
+
+### Green Baseline (verified)
+
+```text
+Run:        32754956252
+Commit:     1edf536c71630f251b31683b504779369e533b55
+Build:      ** TEST BUILD SUCCEEDED **
+Execution:  ** TEST EXECUTE SUCCEEDED **
+Tests:      507 executed, 0 failures, 0 unexpected
+Suites:     17/17 passed
+Toolchain:  Xcode 26.3
+Simulator:  iPhone 16 Pro / iOS 18.5
+```
+
+### Files Changed (across the stabilization work, prior commits)
+
+```text
+ShiftFlow/Persistence/SwiftData/PersistenceContainer.swift
+ShiftFlow/ShiftFlow.xcodeproj/project.pbxproj
+ShiftFlow/App/Info.plist
+ShiftFlow/Widget/Info.plist
+ShiftFlow/UI/Calendar/DayDetailSheet.swift
+ShiftFlow/UI/Shared/TimeFormatter.swift
+ShiftFlow/UI/Shared/AccessibilityLabelBuilder.swift
+ShiftFlow/ShiftFlowDomain/Sources/Import/ShiftExportService.swift
+ShiftFlow/ShiftFlowDomain/Sources/Import/ImportValidator.swift
+ShiftFlow/ShiftFlowDomain/Sources/Import/ShiftImportService.swift
+ShiftFlow/ShiftFlowDomain/Sources/Services/WidgetDeepLink.swift
+ShiftFlow/ShiftFlowDomain/Sources/Services/ (ScheduleRule.swift duplicate removed)
+ShiftFlow/ShiftFlowDomain/Package.swift
+ShiftFlow/ShiftFlowDomain/Tests/ (import/exclusion + repeated-refresh baseline)
+.github/workflows/macos-test.yml
+```
+
+This v0.9.5 entry itself changes only `CHANGELOG.md`.
+
+### Tests
+
+PASS — 507/507 on the GitHub macOS runner (run 32754956252). 0 failures, 0 unexpected.
+
+### Scope Check
+
+No new product feature, no business-logic change, no architecture change, no
+CloudKit behavior change (only compile-time gating for unsigned CI), no tests
+weakened or deleted.
 
 ---
 
