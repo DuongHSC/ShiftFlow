@@ -46,7 +46,8 @@ let package = Package(
                 "ReminderTests.swift",
                 "PolishTests.swift",
                 "IntegrationTests.swift",
-                "TaskManagementTests.swift"
+                "TaskManagementTests.swift",
+                "PersistenceRoundTripTests.swift"
             ]
         )
     ]

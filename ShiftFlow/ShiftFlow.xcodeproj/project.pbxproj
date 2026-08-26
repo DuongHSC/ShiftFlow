@@ -86,6 +86,7 @@
 		A0030016 /* WidgetRefreshIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0030016; };
 		A0030017 /* WidgetScheduleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0030017; };
 		A0030018 /* WorkDayServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0030018; };
+		A0030020 /* PersistenceRoundTripTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0030020; };
 		A0030019 /* ShiftFlowDomain in Frameworks */ = {isa = PBXBuildFile; productRef = P0000003; };
 /* End PBXBuildFile section */
 
@@ -204,6 +205,7 @@
 		B0030016 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShiftFlowDomain/Tests/WidgetRefreshIntegrationTests.swift; sourceTree = SOURCE_ROOT; };
 		B0030017 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShiftFlowDomain/Tests/WidgetScheduleTests.swift; sourceTree = SOURCE_ROOT; };
 		B0030018 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShiftFlowDomain/Tests/WorkDayServiceTests.swift; sourceTree = SOURCE_ROOT; };
+		B0030020 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShiftFlowDomain/Tests/PersistenceRoundTripTests.swift; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -320,6 +322,7 @@
 				B0030001,
 				B0030002, B0030003, B0030004, B0030005, B0030006, B0030007, B0030008, B0030009,
 				B0030010, B0030011, B0030012, B0030013, B0030014, B0030015, B0030016, B0030017, B0030018,
+				B0030020,
 			);
 			name = Tests;
 			sourceTree = "<group>";
@@ -467,6 +470,7 @@
 			files = (
 				A0030001, A0030002, A0030003, A0030004, A0030005, A0030006, A0030007, A0030008, A0030009,
 				A0030010, A0030011, A0030012, A0030013, A0030014, A0030015, A0030016, A0030017, A0030018,
+				A0030020,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
