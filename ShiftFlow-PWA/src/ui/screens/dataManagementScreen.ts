@@ -14,6 +14,7 @@ import { el, toast } from "@/ui/components/dom";
 import { toISODateLocal } from "@/domain/resolver/datetime";
 import {
   applyBackup,
+  clearAllData as clearDatabase,
   exportBackupJson,
   parseBackup,
   type BackupImportMode,
@@ -136,6 +137,20 @@ export function renderDataManagement(ctx: DataScreenContext): HTMLElement {
       el("div", { class: "tiny", text: "Chọn tệp → xem trước → nhập. Không ghi đè âm thầm." }),
     ]),
 
+    el("div", { class: "section-label", text: "Xóa dữ liệu" }),
+    el("div", { class: "card danger-card" }, [
+      el("div", { class: "stack", style: "gap:6px" }, [
+        el("div", { style: "font-weight:700", text: "Xóa toàn bộ dữ liệu" }),
+        el("div", { class: "tiny", text: "Xóa lịch, công việc, ghi chú và cấu hình tùy chỉnh. Cấu hình mặc định sẽ được khôi phục." }),
+      ]),
+      el("button", {
+        class: "btn danger block",
+        style: "margin-top:14px",
+        text: "Xóa tất cả dữ liệu",
+        onClick: () => void clearAllData(),
+      }),
+    ]),
+
     demoDataCard(ctx),
   ]);
 
@@ -189,6 +204,25 @@ export function renderDataManagement(ctx: DataScreenContext): HTMLElement {
     openCsvPreview(preview, ctx);
   }
 
+  async function clearAllData(): Promise<void> {
+    const confirmed = window.confirm(
+      "Xóa TẤT CẢ dữ liệu trên thiết bị? Lịch, Task, công việc, ghi chú và ca tùy chỉnh sẽ bị xóa. Không thể hoàn tác.",
+    );
+    if (!confirmed) return;
+
+    try {
+      app.notificationScheduler.clear();
+      await clearDatabase(db);
+      // Keep the app usable after a full reset by restoring the built-in
+      // C1–C5 / MW configuration.
+      await app.bootstrap();
+      toast("Đã xóa dữ liệu và khôi phục mặc định");
+      ctx.refresh();
+    } catch (err) {
+      toast(err instanceof Error ? err.message : "Xóa dữ liệu thất bại");
+    }
+  }
+
   return screen;
 }
 
@@ -227,6 +261,7 @@ function openJsonPreview(backup: ShiftFlowBackup, ctx: DataScreenContext): void 
       summaryRow("Quy tắc lịch", d.scheduleRules.length),
       summaryRow("Task", d.taskDefinitions.length),
       summaryRow("Gán task", d.workDayTasks.length),
+      summaryRow("Công việc", d.workDayEvents.length),
       summaryRow("Nhắc nhở", d.reminders.length),
     ]),
     el("div", { class: "section-label", text: "Chế độ nhập" }),

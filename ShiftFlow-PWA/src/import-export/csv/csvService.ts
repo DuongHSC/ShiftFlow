@@ -13,6 +13,7 @@ import {
   buildCsv,
   isOffRow,
   parseCsv,
+  shiftAliasKey,
   validateCsv,
   type CsvValidatedRow,
   type ExportWorkDayInput,
@@ -60,10 +61,24 @@ export class CsvService {
     const knownTaskCodes = new Set(
       (await this.tasks.allTasks()).map((t) => t.code),
     );
+    const knownShiftAliases = new Map<string, string>();
+    for (const shift of await this.config.allShifts()) {
+      knownShiftAliases.set(shiftAliasKey(shift.code), shift.code.toUpperCase());
+      if (shift.name) {
+        knownShiftAliases.set(shiftAliasKey(shift.name), shift.code.toUpperCase());
+      }
+      // Also accept the common human label "Ca 1"/"Ca1" for canonical
+      // codes like C1, even when the configured display name is still C1.
+      const numberedCode = /^C(\d+)$/i.exec(shift.code.trim());
+      if (numberedCode) {
+        knownShiftAliases.set(`CA${numberedCode[1]}`, shift.code.toUpperCase());
+      }
+    }
 
     const rows = validateCsv(raw, {
       existingWorkDayDates: existingDates,
       knownTaskCodes,
+      knownShiftAliases,
     });
 
     const offCount = rows.filter((r) => isOffRow(r) && r.status.kind === "valid")

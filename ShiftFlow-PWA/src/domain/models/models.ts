@@ -158,11 +158,25 @@ export interface WorkDayTask {
    * visibility — there is no per-screen visibility preference.
    */
   isVisible?: boolean;
-  /** Optional task-specific time on this WorkDay, formatted as "HH:mm". */
+  /**
+   * Legacy task timing retained for backup/migration compatibility.
+   * New timed items belong to WorkDayEvent and the UI never edits these fields.
+   */
   startTime?: string | null;
-  /** Optional task-specific end time on this WorkDay, formatted as "HH:mm". */
   endTime?: string | null;
-  /** Optional reminder preference for this task assignment. */
+  reminderOffset?: ReminderOffset | null;
+  reminderEnabled?: boolean;
+  createdAt: string; // ISO
+  modifiedAt: string; // ISO
+}
+
+/** A concrete timed item on one WorkDay, e.g. "Meeting 14:00-20:00". */
+export interface WorkDayEvent {
+  id: string;
+  workDayID: string;
+  title: string;
+  startTime: string; // "HH:mm"
+  endTime: string; // "HH:mm"
   reminderOffset?: ReminderOffset | null;
   reminderEnabled?: boolean;
   createdAt: string; // ISO

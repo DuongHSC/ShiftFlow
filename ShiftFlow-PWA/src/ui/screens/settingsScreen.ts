@@ -113,7 +113,7 @@ function renderRoot(ctx: ScreenContext): HTMLElement {
     el("div", { class: "section-label", style: "margin-top:8px", text: "Cài đặt" }),
     el("div", { class: "list-group" }, [
       row("\u2699", "Cấu hình ca làm việc", "Quản lý các ca và quy tắc", () => go(ctx, "shifts")),
-      row("\u2611", "Quản lý công việc", "Thêm, sửa, bật/tắt công việc", () => go(ctx, "tasks")),
+      row("\u2611", "Quản lý Task", "Thêm, bật/tắt và xóa Task", () => go(ctx, "tasks")),
       row("\uD83D\uDD14", "Nhắc nhở", "Thiết lập thời gian nhắc", undefined, false),
       row("\uD83C\uDFA8", "Giao diện", "Sáng / Tối / Tự động", () => go(ctx, "appearance")),
     ]),
@@ -173,9 +173,12 @@ async function renderShiftList(ctx: ScreenContext): Promise<HTMLElement> {
           el("div", { class: "stack" }, [
             el("div", {
               style: "font-weight:700",
-              text: s.name && s.name !== s.code ? `${s.code} — ${s.name}` : s.code,
+              text: s.name || s.code,
             }),
-            el("div", { class: "tiny", text: `Nghỉ ${hhmm(s.breakStartHour, s.breakStartMinute)}–${hhmm(s.breakEndHour, s.breakEndMinute)}` }),
+            el("div", {
+              class: "tiny",
+              text: `${s.isActive ? "Đang bật" : "Đã ẩn"} · Nghỉ ${hhmm(s.breakStartHour, s.breakStartMinute)}–${hhmm(s.breakEndHour, s.breakEndMinute)}`,
+            }),
           ]),
         ]),
         el("div", { class: "row", style: "gap:10px" }, [
@@ -288,22 +291,32 @@ async function renderShiftEditor(ctx: ScreenContext): Promise<HTMLElement> {
 
   const del = async () => {
     if (!existing) return;
-    // Protection: never cascade-delete historical WorkDays.
-    const usedBy = (await app.workDayService.all()).filter(
-      (w) => w.shiftID === existing.id,
-    ).length;
-    if (usedBy > 0) {
-      toast(`Không thể xóa ca — đang dùng trong ${usedBy} ngày làm việc.`);
-      return;
+    try {
+      const result = await app.configService.deleteShift(existing.id);
+      toast(
+        result === "deactivated"
+          ? `Đã ẩn ca ${existing.code}; lịch sử cũ vẫn được giữ`
+          : `Đã xóa ca ${existing.code}`,
+      );
+      go(ctx, "shifts");
+    } catch (err) {
+      toast(err instanceof Error ? err.message : "Xóa ca thất bại");
     }
-    await app.configService.deleteShift(existing.id);
-    toast(`Đã xóa ca ${existing.code}`);
+  };
+
+  const reactivate = async () => {
+    if (!existing || existing.isActive) return;
+    await app.configService.updateShift({ ...existing, isActive: true });
+    toast(`Đã bật lại ca ${existing.code}`);
     go(ctx, "shifts");
   };
 
   return el("div", { class: "screen" }, [
     backBar(ctx, "‹ Cấu hình ca", "shifts"),
-    el("h1", { class: "screen-title", text: existing ? existing.name : "Thêm ca" }),
+    el("h1", {
+      class: "screen-title",
+      text: existing ? (existing.name || existing.code) : "Thêm ca",
+    }),
     el("div", { class: "card" }, [
       field("Tên ca", nameInput),
       el("label", { class: "field" }, [el("span", { text: "Màu ca" }), swatches]),
@@ -322,6 +335,14 @@ async function renderShiftEditor(ctx: ScreenContext): Promise<HTMLElement> {
           style: "margin-top:8px",
           text: "Xóa ca",
           onClick: () => void del(),
+        })
+      : null,
+    existing && !existing.isActive
+      ? el("button", {
+          class: "btn primary block",
+          style: "margin-top:8px",
+          text: "Bật lại ca",
+          onClick: () => void reactivate(),
         })
       : null,
   ]);
@@ -383,31 +404,55 @@ async function renderTaskList(ctx: ScreenContext): Promise<HTMLElement> {
 
   const rows = tasks.length
     ? tasks.map((t) =>
-        el("div", { class: "list-row" }, [
+        el("div", { class: "list-row task-settings-row" }, [
           el("div", { class: "stack" }, [
             el("div", { style: "font-weight:600", text: `${t.code} — ${t.name}` }),
             el("div", { class: "tiny", text: t.isActive ? "Đang bật" : "Đã tắt" }),
           ]),
-          el("button", {
-            class: `btn ghost small ${t.isActive ? "" : "muted-btn"}`,
-            text: t.isActive ? "Bật" : "Tắt",
-            onClick: async (e: Event) => {
-              (e as Event).stopPropagation();
-              await app.taskService.setActive(t.id, !t.isActive);
-              ctx.refresh();
-            },
-          }),
+          el("div", { class: "row task-settings-actions", style: "gap:6px" }, [
+            el("button", {
+              class: `btn ghost small ${t.isActive ? "" : "muted-btn"}`,
+              text: t.isActive ? "Bật" : "Tắt",
+              onClick: async (e: Event) => {
+                (e as Event).stopPropagation();
+                await app.taskService.setActive(t.id, !t.isActive);
+                ctx.refresh();
+              },
+            }),
+            el("button", {
+              class: "btn danger small",
+              text: "Xóa",
+              onClick: async (e: Event) => {
+                (e as Event).stopPropagation();
+                const confirmed = window.confirm(
+                  `Xóa Task "${t.code}"? Thao tác này không thể hoàn tác.`,
+                );
+                if (!confirmed) return;
+                try {
+                  const result = await app.taskService.deleteTask(t.id);
+                  toast(
+                    result === "deactivated"
+                      ? `Đã ẩn task ${t.code}; lịch sử cũ vẫn được giữ`
+                      : `Đã xóa task ${t.code}`,
+                  );
+                  ctx.refresh();
+                } catch (err) {
+                  toast(err instanceof Error ? err.message : "Xóa task thất bại");
+                }
+              },
+            }),
+          ]),
         ]),
       )
     : [el("div", { class: "empty-state", text: "Chưa có công việc." })];
 
   return el("div", { class: "screen" }, [
     backBar(ctx, "‹ Cài đặt", "root"),
-    el("h1", { class: "screen-title", text: "Quản lý công việc" }),
+    el("h1", { class: "screen-title", text: "Quản lý Task" }),
     el("div", { class: "list-group" }, rows),
     el("button", {
       class: "btn primary block",
-      text: "+ Thêm công việc",
+      text: "+ Thêm Task",
       onClick: () => {
         editingTaskId = null;
         go(ctx, "taskEditor");
@@ -436,8 +481,8 @@ async function renderTaskEditor(ctx: ScreenContext): Promise<HTMLElement> {
 
   return el("div", { class: "screen" }, [
     backBar(ctx, "‹ Quản lý công việc", "tasks"),
-    el("h1", { class: "screen-title", text: "Thêm công việc" }),
-    el("div", { class: "card" }, [field("Mã", codeInput), field("Tên", nameInput)]),
+    el("h1", { class: "screen-title", text: "Thêm Task" }),
+    el("div", { class: "card" }, [field("Mã Task", codeInput), field("Tên Task", nameInput)]),
     el("div", { class: "btn-row" }, [
       el("button", { class: "btn ghost block", text: "Hủy", onClick: () => go(ctx, "tasks") }),
       el("button", { class: "btn primary block", text: "Lưu", onClick: () => void add() }),

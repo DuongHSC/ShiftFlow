@@ -3,17 +3,19 @@
 //
 // Day Detail bottom sheet with VIEW (default) and EDIT modes.
 //
-// - VIEW: read-only. Shows shift, times, VISIBLE tasks, note, reminder. A
+// - VIEW: read-only. Shows shift, times, VISIBLE tasks, timed work items, note,
+//   and reminder. A
 //   pencil (✏) in the header switches to EDIT.
-// - EDIT: change shift, add/remove task, hide/unhide task (eye — never deletes
-//   the definition), edit note, set reminder, Save/Delete.
+// - EDIT: change shift, add/remove tasks, add/edit/remove timed work items,
+//   hide/unhide task (eye — never deletes the definition), edit note, set
+//   reminder, Save/Delete.
 //
 // Single source of truth: task visibility is read/written on WorkDayTask
 // (isVisible). No per-screen visibility state.
 
 import { app } from "@/services/appContainer";
 import { el, toast } from "@/ui/components/dom";
-import { buildShiftColorMap, colorForCode, longDate, shiftBadge, timeFromISO } from "@/ui/components/format";
+import { buildShiftColorMap, colorForCode, longDate, shiftName, shiftTitle, shiftBadge, timeFromISO } from "@/ui/components/format";
 import { fromISODateLocal } from "@/domain/resolver/datetime";
 import type { ReminderOffset, TaskDefinition, WorkDay } from "@/domain/models/models";
 import { ALL_REMINDER_OFFSETS, offsetLabel } from "@/domain/resolver/reminderTiming";
@@ -31,9 +33,20 @@ export async function openDayDetail(
 ): Promise<void> {
   const date = fromISODateLocal(isoDate);
   const existing = await app.workDayService.byDate(date);
-  const shifts = await app.configService.activeShifts();
+  // Include inactive definitions when editing an existing historical WorkDay;
+  // a softly deleted shift must remain selectable for that old record.
+  const configuredShifts = await app.configService.allShifts();
+  const shifts = configuredShifts.filter(
+    (s) => s.isActive || s.code.toUpperCase() === (existing?.shiftCode ?? "").toUpperCase(),
+  );
   const allRules = await app.configService.allRules();
-  let allTasks = await app.taskService.activeTasks();
+  const activeTasks = await app.taskService.activeTasks();
+  const assignedHistoricalTasks = existing
+    ? (await app.taskService.assignmentsForWorkDay(existing.id)).map((a) => a.task)
+    : [];
+  let allTasks = [...new Map(
+    [...activeTasks, ...assignedHistoricalTasks].map((task) => [task.id, task]),
+  ).values()];
   const colors = buildShiftColorMap(shifts);
 
   // Synchronous shift lookup from the config loaded when the sheet opened.
@@ -54,26 +67,34 @@ export async function openDayDetail(
   // Local editable state.
   let selectedCode: string = existing?.shiftCode ?? "OFF";
   let workDay: WorkDay | undefined = existing;
-
-  // Task assignment state: taskId -> { assigned, visible }. Loaded from the
-  // single source of truth (WorkDayTask incl. isVisible).
-  const taskState = new Map<string, {
-    assigned: boolean;
-    visible: boolean;
+  const savedEvents = existing ? await app.eventService.forWorkDay(existing.id) : [];
+  type EventDraft = {
+    title: string;
     startTime: string;
     endTime: string;
     reminderEnabled: boolean;
     reminderOffset: ReminderOffset;
+  };
+  let events: EventDraft[] = savedEvents.map((event) => ({
+    title: event.title,
+    startTime: event.startTime,
+    endTime: event.endTime,
+    reminderEnabled: event.reminderEnabled ?? false,
+    reminderOffset: event.reminderOffset ?? "30min",
+  }));
+
+  // Task assignment state: taskId -> { assigned, visible }. Loaded from the
+  // single source of truth (WorkDayTask incl. isVisible). Timed items live in
+  // WorkDayEvent, not in task assignments.
+  const taskState = new Map<string, {
+    assigned: boolean;
+    visible: boolean;
   }>();
   if (existing) {
     for (const a of await app.taskService.assignmentsForWorkDay(existing.id)) {
       taskState.set(a.task.id, {
         assigned: true,
         visible: a.isVisible,
-        startTime: a.assignment.startTime ?? "",
-        endTime: a.assignment.endTime ?? "",
-        reminderEnabled: a.assignment.reminderEnabled ?? false,
-        reminderOffset: a.assignment.reminderOffset ?? "30min",
       });
     }
   }
@@ -82,10 +103,6 @@ export async function openDayDetail(
       taskState.set(t.id, {
         assigned: false,
         visible: true,
-        startTime: "",
-        endTime: "",
-        reminderEnabled: false,
-        reminderOffset: "30min",
       });
     }
   }
@@ -95,6 +112,7 @@ export async function openDayDetail(
   let reminderEnabled = reminder?.isEnabled ?? false;
   let reminderOffset: ReminderOffset = reminder?.offset ?? "2h";
   let isAddingTask = false;
+  let isAddingEvent = false;
 
   const backdrop = el("div", { class: "sheet-backdrop", role: "dialog", "aria-modal": "true" });
   const sheet = el("div", { class: "sheet" });
@@ -132,6 +150,7 @@ export async function openDayDetail(
   const writeTables = [
     app.db.workDays,
     app.db.workDayTasks,
+    app.db.workDayEvents,
     app.db.reminders,
     app.db.taskDefinitions,
   ];
@@ -144,6 +163,7 @@ export async function openDayDetail(
           const id = workDay.id;
           await app.db.transaction("rw", writeTables, async () => {
             await app.taskService.removeAllTasks(id);
+            await app.eventService.deleteForWorkDay(id);
             await app.reminderService.clearReminder(id);
             await app.workDayService.delete(id);
           });
@@ -185,14 +205,21 @@ export async function openDayDetail(
           if (!st.assigned && current.has(id)) await app.taskService.removeTask(id, wd.id);
           if (st.assigned) {
             await app.taskService.setTaskVisibility(id, wd.id, st.visible);
-            await app.taskService.setTaskDetails(id, wd.id, {
-              startTime: st.startTime || null,
-              endTime: st.endTime || null,
-              reminderEnabled: st.reminderEnabled,
-              reminderOffset: st.reminderEnabled ? st.reminderOffset : null,
-            });
           }
         }
+
+        await app.eventService.replaceForWorkDay(
+          wd.id,
+          events
+            .map((event) => ({
+              title: event.title.trim(),
+              startTime: event.startTime,
+              endTime: event.endTime,
+              reminderEnabled: event.reminderEnabled ?? false,
+              reminderOffset: event.reminderOffset ?? "30min",
+            }))
+            .filter((event) => event.title && event.startTime && event.endTime),
+        );
 
         if (reminderEnabled) {
           await app.reminderService.setReminder(wd.id, reminderOffset, true);
@@ -226,6 +253,7 @@ export async function openDayDetail(
     const id = workDay.id;
     await app.db.transaction("rw", writeTables, async () => {
       await app.taskService.removeAllTasks(id);
+      await app.eventService.deleteForWorkDay(id);
       await app.reminderService.clearReminder(id);
       await app.workDayService.delete(id);
     });
@@ -345,6 +373,7 @@ export async function openDayDetail(
         el("div", { class: "row", style: "align-items:center" }, [
           shiftBadge(w.shiftCode, colors, { size: "md" }),
           el("div", { class: "stack", style: "flex:1;margin-left:12px" }, [
+            el("div", { class: "shift-title", text: shiftTitle(w.shiftCode, shifts) }),
             el("div", { class: "time", style: "font-size:18px", text: `${timeFromISO(w.resolvedStartDateTime)} – ${timeFromISO(w.resolvedEndDateTime)}` }),
             el("div", { class: "muted", text: `Nghỉ ${timeFromISO(w.resolvedBreakStartDateTime)}–${timeFromISO(w.resolvedBreakEndDateTime)}` }),
           ]),
@@ -352,26 +381,35 @@ export async function openDayDetail(
       ]),
     );
 
-    parts.push(el("div", { class: "section-label", text: "Công việc" }));
+    parts.push(el("div", { class: "section-label", text: "Task" }));
     parts.push(
       visibleTasks.length
-        ? el("div", { class: "task-list" }, visibleTasks.map(({ task, assignment }) =>
+        ? el("div", { class: "task-list" }, visibleTasks.map(({ task }) =>
             el("div", { class: "task-row" }, [
               el("div", { class: "stack", style: "flex:1" }, [
                 el("div", { style: "font-weight:600", text: task.code }),
-                el("div", {
-                  class: "tiny",
-                  text: assignment.startTime && assignment.endTime
-                    ? `${assignment.startTime}–${assignment.endTime}`
-                    : task.name,
-                }),
+                el("div", { class: "tiny", text: task.name }),
               ]),
-              assignment.reminderEnabled
-                ? el("span", { class: "badge-soon", text: offsetLabel(assignment.reminderOffset ?? "30min") })
-                : null,
             ]),
           ))
         : el("div", { class: "muted", text: "Không có task" }),
+    );
+
+    parts.push(el("div", { class: "section-label", text: "Công việc" }));
+    parts.push(
+      events.length
+        ? el("div", { class: "task-list" }, events.map((event) =>
+            el("div", { class: "task-row" }, [
+              el("div", { class: "stack", style: "flex:1" }, [
+                el("div", { style: "font-weight:600", text: event.title }),
+                el("div", { class: "tiny", text: `${event.startTime}–${event.endTime}` }),
+              ]),
+              event.reminderEnabled
+                ? el("span", { class: "badge-soon", text: offsetLabel(event.reminderOffset) })
+                : null,
+            ]),
+          ))
+        : el("div", { class: "muted", text: "Chưa có công việc phát sinh" }),
     );
 
     parts.push(el("div", { class: "section-label", text: "Ghi chú" }));
@@ -389,7 +427,7 @@ export async function openDayDetail(
   // ---------- EDIT MODE ----------
 
   function editShiftChips(): HTMLElement {
-    const chip = (code: string, isOff = false): HTMLElement =>
+    const chip = (code: string, isOff = false, label = code): HTMLElement =>
       el(
         "button",
         {
@@ -406,10 +444,13 @@ export async function openDayDetail(
             "aria-hidden": "true",
             style: `background:${isOff ? "var(--shift-off)" : colorForCode(code, colors)}`,
           }),
-          code,
+          label,
         ],
       );
-    return el("div", { class: "chips" }, [chip("OFF", true), ...shifts.map((s) => chip(s.code))]);
+    return el("div", { class: "chips" }, [
+      chip("OFF", true),
+      ...shifts.map((s) => chip(s.code, false, shiftName(s.code, shifts))),
+    ]);
   }
 
   async function editTimesBlock(): Promise<HTMLElement> {
@@ -479,7 +520,7 @@ export async function openDayDetail(
     const addNew = isAddingTask ? newTaskForm() : el("button", {
       class: "btn ghost block",
       style: "margin-top:10px",
-      text: "+ Công việc",
+      text: "+ Task",
       onClick: () => {
         isAddingTask = true;
         void render();
@@ -508,21 +549,17 @@ export async function openDayDetail(
         taskState.set(created.id, {
           assigned: true,
           visible: true,
-          startTime: "",
-          endTime: "",
-          reminderEnabled: false,
-          reminderOffset: "30min",
         });
         isAddingTask = false;
         toast(`Đã thêm ${created.code}`);
         void render();
       } catch (err) {
-        toast(err instanceof Error ? err.message : "Thêm công việc thất bại");
+        toast(err instanceof Error ? err.message : "Thêm task thất bại");
       }
     };
 
     return el("div", { class: "card tight inline-task-form", style: "margin-top:10px" }, [
-      field("Mã công việc", codeInput),
+      field("Mã task", codeInput),
       field("Tên", nameInput),
       el("div", { class: "btn-row" }, [
         el("button", {
@@ -568,55 +605,168 @@ export async function openDayDetail(
       el("div", { class: "stack", style: "flex:1;gap:8px" }, [
         el("div", { style: "font-weight:600", text: t.code }),
         el("div", { class: "tiny", text: st.visible ? t.name : "Đang ẩn" }),
-        el("div", { class: "task-time-grid" }, [
-          el("label", { class: "field compact" }, [
-            el("span", { text: "Bắt đầu" }),
-            el("input", {
-              type: "time",
-              value: st.startTime,
-              onInput: (e: Event) => {
-                st.startTime = (e.target as HTMLInputElement).value;
-              },
-            }),
-          ]),
-          el("label", { class: "field compact" }, [
-            el("span", { text: "Kết thúc" }),
-            el("input", {
-              type: "time",
-              value: st.endTime,
-              onInput: (e: Event) => {
-                st.endTime = (e.target as HTMLInputElement).value;
-              },
-            }),
-          ]),
-        ]),
-        el("div", { class: "task-reminder-row" }, [
-          el("label", { class: "row task-reminder-toggle" }, [
-            el("span", { class: "tiny", text: "Nhắc việc" }),
-            el("input", {
-              type: "checkbox",
-              ...(st.reminderEnabled ? { checked: "checked" } : {}),
-              onChange: (e: Event) => {
-                st.reminderEnabled = (e.target as HTMLInputElement).checked;
-                if (st.reminderEnabled) void app.notificationScheduler.requestPermission();
-              },
-            }),
-          ]),
-          el(
-            "select",
-            {
-              onChange: (e: Event) => {
-                st.reminderOffset = (e.target as HTMLSelectElement).value as ReminderOffset;
-              },
-            },
-            ALL_REMINDER_OFFSETS.map((o) =>
-              el("option", { value: o, ...(o === st.reminderOffset ? { selected: "selected" } : {}) }, [offsetLabel(o)]),
-            ),
-          ),
-        ]),
       ]),
       remove,
     ]);
+  }
+
+  function newEventForm(): HTMLElement {
+    const titleInput = el("input", {
+      type: "text",
+      placeholder: "Ví dụ: Meeting",
+    });
+    const startInput = el("input", { type: "time" });
+    const endInput = el("input", { type: "time" });
+    const reminderToggle = el("input", {
+      type: "checkbox",
+      onChange: (e: Event) => {
+        if ((e.target as HTMLInputElement).checked) {
+          void app.notificationScheduler.requestPermission();
+        }
+      },
+    });
+    const reminderSelect = el(
+      "select",
+      {},
+      ALL_REMINDER_OFFSETS.map((o) =>
+        el("option", { value: o, ...(o === "30min" ? { selected: "selected" } : {}) }, [offsetLabel(o)]),
+      ),
+    );
+
+    const create = () => {
+      const title = (titleInput as HTMLInputElement).value.trim();
+      const startTime = (startInput as HTMLInputElement).value;
+      const endTime = (endInput as HTMLInputElement).value;
+      if (!title || !startTime || !endTime) {
+        toast("Công việc cần tên, giờ bắt đầu và giờ kết thúc");
+        return;
+      }
+      events.push({
+        title,
+        startTime,
+        endTime,
+        reminderEnabled: (reminderToggle as HTMLInputElement).checked,
+        reminderOffset: (reminderSelect as HTMLSelectElement).value as ReminderOffset,
+      });
+      isAddingEvent = false;
+      void render();
+    };
+
+    return el("div", { class: "card tight inline-event-form", style: "margin-top:10px" }, [
+      field("Tên công việc", titleInput),
+      el("div", { class: "task-time-grid" }, [
+        field("Bắt đầu", startInput),
+        field("Kết thúc", endInput),
+      ]),
+      el("div", { class: "task-reminder-row", style: "margin-top:10px" }, [
+        el("label", { class: "row task-reminder-toggle" }, [
+          el("span", { class: "tiny", text: "Nhắc công việc" }),
+          reminderToggle,
+        ]),
+        reminderSelect,
+      ]),
+      el("div", { class: "btn-row" }, [
+        el("button", {
+          class: "btn ghost block",
+          text: "Hủy",
+          onClick: () => {
+            isAddingEvent = false;
+            void render();
+          },
+        }),
+        el("button", { class: "btn primary block", text: "Thêm", onClick: create }),
+      ]),
+    ]);
+  }
+
+  function editEventSection(): HTMLElement {
+    const list = el(
+      "div",
+      { class: "task-list" },
+      events.length
+        ? events.map((event, index) =>
+            el("div", { class: "task-row" }, [
+              el("div", { class: "stack", style: "flex:1;gap:8px" }, [
+                el("input", {
+                  type: "text",
+                  value: event.title,
+                  onInput: (e: Event) => {
+                    event.title = (e.target as HTMLInputElement).value;
+                  },
+                }),
+                el("div", { class: "task-time-grid" }, [
+                  el("label", { class: "field compact" }, [
+                    el("span", { text: "Bắt đầu" }),
+                    el("input", {
+                      type: "time",
+                      value: event.startTime,
+                      onInput: (e: Event) => {
+                        event.startTime = (e.target as HTMLInputElement).value;
+                      },
+                    }),
+                  ]),
+                  el("label", { class: "field compact" }, [
+                    el("span", { text: "Kết thúc" }),
+                    el("input", {
+                      type: "time",
+                      value: event.endTime,
+                      onInput: (e: Event) => {
+                        event.endTime = (e.target as HTMLInputElement).value;
+                      },
+                    }),
+                  ]),
+                ]),
+                el("div", { class: "task-reminder-row" }, [
+                  el("label", { class: "row task-reminder-toggle" }, [
+                    el("span", { class: "tiny", text: "Nhắc công việc" }),
+                    el("input", {
+                      type: "checkbox",
+                      ...(event.reminderEnabled ? { checked: "checked" } : {}),
+                      onChange: (e: Event) => {
+                        event.reminderEnabled = (e.target as HTMLInputElement).checked;
+                        if (event.reminderEnabled) void app.notificationScheduler.requestPermission();
+                      },
+                    }),
+                  ]),
+                  el(
+                    "select",
+                    {
+                      onChange: (e: Event) => {
+                        event.reminderOffset = (e.target as HTMLSelectElement).value as ReminderOffset;
+                      },
+                    },
+                    ALL_REMINDER_OFFSETS.map((o) =>
+                      el("option", { value: o, ...(o === event.reminderOffset ? { selected: "selected" } : {}) }, [offsetLabel(o)]),
+                    ),
+                  ),
+                ]),
+              ]),
+              el("button", {
+                class: "btn ghost small",
+                text: "×",
+                "aria-label": `Xóa ${event.title}`,
+                onClick: () => {
+                  events.splice(index, 1);
+                  void render();
+                },
+              }),
+            ]),
+          )
+        : [el("div", { class: "tiny", text: "Chưa có công việc phát sinh." })],
+    );
+
+    const add = isAddingEvent
+      ? newEventForm()
+      : el("button", {
+          class: "btn ghost block",
+          style: "margin-top:10px",
+          text: "+ Công việc",
+          onClick: () => {
+            isAddingEvent = true;
+            void render();
+          },
+        });
+    return el("div", {}, [list, add]);
   }
 
   async function renderEdit(): Promise<HTMLElement[]> {
@@ -654,6 +804,8 @@ export async function openDayDetail(
       await editTimesBlock(),
       el("div", { class: "section-label", text: "Task" }),
       editTaskSection(),
+      el("div", { class: "section-label", text: "Công việc" }),
+      editEventSection(),
       el("div", { class: "section-label", text: "Ghi chú" }),
       noteInput,
       el("div", { class: "section-label", text: "Nhắc nhở" }),

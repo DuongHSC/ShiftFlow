@@ -81,8 +81,11 @@ export class TaskService {
     await this.defs.put({ ...existing, isActive, modifiedAt: nowISO() });
   }
 
-  /** Deletes a task; refuses if referenced by any assignment (preserve history). */
-  async deleteTask(id: string): Promise<void> {
+  /**
+   * Deletes a task definition. If historical WorkDay assignments reference it,
+   * soft-delete by deactivating the definition so old days remain readable.
+   */
+  async deleteTask(id: string): Promise<"deleted" | "deactivated"> {
     const all = await this.defs.all();
     const existing = all.find((t) => t.id === id);
     if (!existing) throw new TaskError("notFound", "Không tìm thấy task");
@@ -90,9 +93,11 @@ export class TaskService {
       (a) => a.taskDefinitionID === id,
     );
     if (referenced) {
-      throw new TaskError("taskInUse", `Task đang được sử dụng: ${existing.code}`);
+      await this.defs.put({ ...existing, isActive: false, modifiedAt: nowISO() });
+      return "deactivated";
     }
     await this.defs.delete(id);
+    return "deleted";
   }
 
   // MARK: assignments
@@ -184,6 +189,8 @@ export class TaskService {
       "startTime" | "endTime" | "reminderEnabled" | "reminderOffset"
     >,
   ): Promise<void> {
+    // Legacy compatibility for records created before timed work was split
+    // into WorkDayEvent. New UI flows write timing/reminders to events only.
     const joins = (await this.assigns.forWorkDay(workDayID)).filter(
       (a) => a.taskDefinitionID === taskDefinitionID,
     );

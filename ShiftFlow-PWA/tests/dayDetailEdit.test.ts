@@ -84,11 +84,11 @@ describe("Day Edit — single Save action", () => {
     const inlineCode = `Inline${Date.now()}`;
     await openDayDetail(FIXTURE_ISO, () => {}, { mode: "edit" });
     let sheet = document.querySelector(".sheet")!;
-    buttonsByText(sheet, "+ Công việc")[0].click();
+    buttonsByText(sheet, "+ Task")[0].click();
     await new Promise((r) => setTimeout(r, 0));
 
     sheet = document.querySelector(".sheet")!;
-    expect(sheet.textContent).toContain("Mã công việc");
+    expect(sheet.textContent).toContain("Mã task");
     const form = sheet.querySelector(".inline-task-form")!;
     const inputs = Array.from(form.querySelectorAll<HTMLInputElement>('input[type="text"]'));
     inputs[0].value = inlineCode;

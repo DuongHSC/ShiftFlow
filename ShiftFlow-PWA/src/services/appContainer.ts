@@ -12,6 +12,7 @@ import {
   ShiftDefinitionRepository,
   TaskDefinitionRepository,
   WorkDayRepository,
+  WorkDayEventRepository,
   WorkDayTaskRepository,
 } from "@/storage/repositories/repositories";
 import { seedIfNeeded } from "@/storage/seeding";
@@ -21,11 +22,13 @@ import { ReminderService } from "@/services/reminders/reminderService";
 import { NotificationScheduler } from "@/services/reminders/notificationScheduler";
 import { ShiftConfigurationService } from "@/services/settings/shiftConfigurationService";
 import { CsvService } from "@/import-export/csv/csvService";
+import { WorkDayEventService } from "@/services/events/workDayEventService";
 
 export class AppContainer {
   readonly db: ShiftFlowDB;
   readonly workDayService: WorkDayService;
   readonly taskService: TaskService;
+  readonly eventService: WorkDayEventService;
   readonly reminderService: ReminderService;
   readonly notificationScheduler: NotificationScheduler;
   readonly configService: ShiftConfigurationService;
@@ -39,11 +42,13 @@ export class AppContainer {
     const ruleRepo = new ScheduleRuleRepository(db);
     const taskDefRepo = new TaskDefinitionRepository(db);
     const assignRepo = new WorkDayTaskRepository(db);
+    const eventRepo = new WorkDayEventRepository(db);
     const reminderRepo = new ReminderRepository(db);
 
-    this.configService = new ShiftConfigurationService(shiftRepo, ruleRepo);
+    this.configService = new ShiftConfigurationService(shiftRepo, ruleRepo, workDayRepo);
     this.workDayService = new WorkDayService(workDayRepo);
     this.taskService = new TaskService(taskDefRepo, assignRepo);
+    this.eventService = new WorkDayEventService(eventRepo);
     this.reminderService = new ReminderService(reminderRepo);
     this.notificationScheduler = new NotificationScheduler(db);
     this.csvService = new CsvService(

@@ -6,7 +6,8 @@
 // exchange format. Format is NOT redesigned.
 //
 // Columns: Date | Shift | Task | Note
-// Date format: DD/MM/YYYY. Valid shift codes: C1..C5, OFF.
+// Date format: DD/MM/YYYY. Shift cells accept C1..C5/OFF, configured shift
+// names (e.g. "Ca 5"), and blank cells for OFF.
 // Header detection is case-insensitive (Date/Ngày/Ngay, Shift/Ca).
 // Import delimiter auto-detected from the header: , \t | ;
 
@@ -117,6 +118,20 @@ export interface CsvValidationOptions {
   existingWorkDayDates: Set<string>;
   /** Known task codes (uppercased); empty set skips task validation. */
   knownTaskCodes?: Set<string>;
+  /**
+   * Optional aliases for configured shift names, keyed by shiftAliasKey.
+   * Values must be canonical shift codes (e.g. "C5").
+   */
+  knownShiftAliases?: Map<string, string>;
+}
+
+/** Normalizes a shift code/name for forgiving CSV matching ("Ca 5" = "Ca5"). */
+export function shiftAliasKey(value: string): string {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toUpperCase()
+    .replace(/[\s_-]+/g, "");
 }
 
 export function validateCsv(
@@ -150,14 +165,18 @@ export function validateCsv(
       else isoDate = toISODateLocal(d);
     }
 
-    // Shift.
+    // Shift. Empty cells are treated as OFF so calendar templates can leave
+    // days off blank. Configured display names (e.g. "Ca 5") are accepted and
+    // normalized back to their stable codes (e.g. "C5").
     if (!error) {
       if (!row.shiftString) {
-        error = "Thiếu ca";
+        shiftCode = "OFF";
       } else {
         const norm = row.shiftString.toUpperCase().trim();
-        if (!VALID_CODES.has(norm)) error = `Ca không hợp lệ '${row.shiftString}'`;
-        else shiftCode = norm;
+        const alias = options.knownShiftAliases?.get(shiftAliasKey(row.shiftString));
+        if (VALID_CODES.has(norm)) shiftCode = norm;
+        else if (alias && VALID_CODES.has(alias)) shiftCode = alias;
+        else error = `Ca không hợp lệ '${row.shiftString}'`;
       }
     }
 

@@ -16,6 +16,7 @@ import type { ScreenContext } from "@/ui/navigation/router";
 import {
   buildShiftColorMap,
   longDate,
+  shiftTitle,
   shiftBadge,
   timeFromISO,
   type ShiftColorMap,
@@ -25,7 +26,8 @@ import type { WorkDay } from "@/domain/models/models";
 
 export async function renderUpcoming(_ctx: ScreenContext): Promise<HTMLElement> {
   const base = startOfLocalDay(new Date());
-  const colors = buildShiftColorMap(await app.configService.allShifts());
+  const shifts = await app.configService.allShifts();
+  const colors = buildShiftColorMap(shifts);
 
   // Exactly the next 3 calendar days: today, tomorrow, day after.
   const days: { heading: string; date: Date; size: "md" | "lg" }[] = [
@@ -35,7 +37,7 @@ export async function renderUpcoming(_ctx: ScreenContext): Promise<HTMLElement> 
   ];
 
   const blocks = await Promise.all(
-    days.map((d) => dayBlock(d.heading, d.date, colors, d.size)),
+    days.map((d) => dayBlock(d.heading, d.date, shifts, colors, d.size)),
   );
 
   return el("div", { class: "screen" }, [
@@ -53,6 +55,7 @@ function dayOffset(base: Date, n: number): Date {
 async function dayBlock(
   heading: string,
   d: Date,
+  shifts: Awaited<ReturnType<typeof app.configService.allShifts>>,
   colors: ShiftColorMap,
   size: "md" | "lg",
 ): Promise<HTMLElement> {
@@ -61,6 +64,7 @@ async function dayBlock(
   const visibleTaskCodes = w
     ? (await app.taskService.visibleTasksForWorkDay(w.id)).map((t) => t.code)
     : [];
+  const events = w ? await app.eventService.forWorkDay(w.id) : [];
 
   // Quiet date heading (not a loud uppercase overline): "Hôm nay" + date below.
   return el("div", { class: "stack", style: "gap:8px;margin-bottom:18px" }, [
@@ -68,22 +72,24 @@ async function dayBlock(
       el("span", { class: "day-heading-label", text: heading }),
       el("span", { class: "day-heading-date", text: `· ${longDate(d)}` }),
     ]),
-    shiftCard({ w, visibleTaskCodes, colors, size }),
+    shiftCard({ w, visibleTaskCodes, events, shifts, colors, size }),
   ]);
 }
 
 interface CardArgs {
   w: WorkDay | undefined;
   visibleTaskCodes: string[];
+  events: { title: string; startTime: string; endTime: string }[];
+  shifts: Awaited<ReturnType<typeof app.configService.allShifts>>;
   colors: ShiftColorMap;
   size: "md" | "lg";
 }
 
 function shiftCard(a: CardArgs): HTMLElement {
-  const { w, visibleTaskCodes, colors, size } = a;
+  const { w, visibleTaskCodes, events, shifts, colors, size } = a;
   const timeSize = size === "lg" ? "font-size:22px" : "font-size:18px";
 
-  // Hierarchy: shift badge · time · tasks · note. A FIXED badge column ("wd-card"
+  // Hierarchy: shift badge · time · Task · Công việc · Ghi chú. A FIXED badge column ("wd-card"
   // grid) guarantees the content column starts at the same X for every card,
   // regardless of the shift code text. Note only renders when present.
   const badgeCol = el("div", { class: "wd-badge-col" }, [
@@ -91,13 +97,45 @@ function shiftCard(a: CardArgs): HTMLElement {
   ]);
 
   const content = w
-    ? el("div", { class: "stack wd-content", style: "gap:6px" }, [
+      ? el("div", { class: "stack wd-content", style: "gap:10px" }, [
+        el("div", { class: "shift-title", text: shiftTitle(w.shiftCode, shifts) }),
         el("div", { class: "time", style: timeSize, text: `${timeFromISO(w.resolvedStartDateTime)} – ${timeFromISO(w.resolvedEndDateTime)}` }),
-        visibleTaskCodes.length
-          ? el("div", { class: "chips" },
-              visibleTaskCodes.map((c) => el("span", { class: "chip readonly", text: c })))
-          : null,
-        w.note ? el("div", { class: "note-line", text: w.note }) : null,
+        el("div", { class: "wd-info-grid" }, [
+          el("div", { class: "wd-info-section wd-task-info" }, [
+            el("div", { class: "wd-info-label" }, [
+              el("span", { class: "wd-info-icon", text: "✓", "aria-hidden": "true" }),
+              el("span", { text: "Task" }),
+            ]),
+            visibleTaskCodes.length
+              ? el("div", { class: "chips" },
+                  visibleTaskCodes.map((c) => el("span", { class: "chip readonly", text: c })))
+              : el("div", { class: "wd-empty-info", text: "Chưa có task" }),
+          ]),
+          el("div", { class: "wd-info-section wd-event-info" }, [
+            el("div", { class: "wd-info-label" }, [
+              el("span", { class: "wd-info-icon", text: "◷", "aria-hidden": "true" }),
+              el("span", { text: "Công việc" }),
+            ]),
+            events.length
+              ? el("div", { class: "wd-event-list" },
+                  events.map((event) =>
+                    el("div", { class: "wd-event-line" }, [
+                      el("span", { class: "wd-event-title", text: event.title }),
+                      el("span", { class: "wd-event-time", text: `${event.startTime}–${event.endTime}` }),
+                    ]),
+                  ))
+              : el("div", { class: "wd-empty-info", text: "Chưa có công việc" }),
+          ]),
+          w.note
+            ? el("div", { class: "wd-info-section wd-note-info" }, [
+                el("div", { class: "wd-info-label" }, [
+                  el("span", { class: "wd-info-icon", text: "✎", "aria-hidden": "true" }),
+                  el("span", { text: "Ghi chú" }),
+                ]),
+                el("div", { class: "note-line", text: w.note }),
+              ])
+            : null,
+        ]),
       ])
     : el("div", { class: "stack wd-content", style: "gap:4px" }, [
         el("div", { class: "time", style: timeSize, text: "Nghỉ" }),

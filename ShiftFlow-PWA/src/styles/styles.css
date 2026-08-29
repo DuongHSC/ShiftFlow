@@ -8,13 +8,13 @@
 
 :root {
   /* Palette */
-  --bg: #f5f6f8;
+  --bg: #f4f6fa;
   --surface: #ffffff;
-  --surface-2: #f0f2f5;
+  --surface-2: #f3f5f9;
   --text: #1c1c1e;
   --text-2: #6b7280;
   --text-3: #9aa0a6;
-  --border: #e5e7eb;
+  --border: #e7eaf0;
   --primary: #2f6feb;
   --primary-contrast: #ffffff;
   --danger: #e5484d;
@@ -30,13 +30,13 @@
   --shift-off: #9aa0a6;
 
   /* Shape & spacing */
-  --radius: 16px;
+  --radius: 18px;
   --radius-sm: 10px;
   --radius-lg: 22px;
   --space: 16px;
   --space-sm: 8px;
   --space-lg: 24px;
-  --shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 8px 24px rgba(0, 0, 0, 0.05);
+  --shadow: 0 1px 2px rgba(21, 31, 56, 0.04), 0 12px 30px rgba(21, 31, 56, 0.07);
   --nav-height: 64px;
 
   --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
@@ -131,14 +131,14 @@ body {
 }
 
 .app-title {
-  font-size: 15px;
-  font-weight: 600;
+  font-size: 14px;
+  font-weight: 700;
   color: var(--primary);
   letter-spacing: 0.02em;
 }
 
 .screen-title {
-  font-size: 28px;
+  font-size: 30px;
   font-weight: 800;
   margin: 2px 0 2px;
 }
@@ -146,7 +146,7 @@ body {
 .screen-subtitle {
   color: var(--text-2);
   font-size: 15px;
-  margin-bottom: var(--space-lg);
+  margin-bottom: 20px;
 }
 
 .section-label {
@@ -166,6 +166,7 @@ body {
   box-shadow: var(--shadow);
   padding: var(--space);
   margin-bottom: var(--space);
+  border: 1px solid color-mix(in srgb, var(--border) 72%, transparent);
 }
 
 .card.tight {
@@ -835,6 +836,19 @@ label.field > span {
   justify-content: space-between;
   gap: 12px;
 }
+.task-settings-row {
+  gap: 10px;
+}
+.task-settings-row > .stack {
+  min-width: 0;
+}
+.task-settings-actions {
+  flex: 0 0 auto;
+}
+.danger-card {
+  border: 1px solid color-mix(in srgb, var(--danger) 28%, var(--border));
+  background: color-mix(in srgb, var(--danger) 4%, var(--surface));
+}
 
 /* Smaller buttons */
 .btn.small {
@@ -1073,6 +1087,135 @@ label.field.compact input {
 }
 .wd-content {
   min-width: 0; /* allow chips/notes to wrap instead of stretching the grid */
+}
+.today-content {
+  min-width: 0;
+}
+.shift-title {
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 750;
+  line-height: 1.25;
+}
+.wd-content > .shift-title,
+.today-content > .shift-title,
+.calendar-detail-content > .shift-title {
+  margin-bottom: -5px;
+}
+
+/* Clear visual hierarchy inside a WorkDay card:
+   Task = reusable day tag, Công việc = timed item, Ghi chú = free text. */
+.wd-info-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+.wd-info-section {
+  border-radius: 12px;
+  padding: 9px 10px;
+  background: var(--surface-2);
+}
+.wd-task-info {
+  background: color-mix(in srgb, var(--primary) 7%, var(--surface));
+}
+.wd-event-info {
+  background: color-mix(in srgb, var(--warning) 8%, var(--surface));
+}
+.wd-note-info {
+  background: color-mix(in srgb, var(--text-3) 8%, var(--surface));
+}
+.wd-info-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+  color: var(--text-2);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.wd-info-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 17px;
+  height: 17px;
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--primary);
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0;
+}
+.wd-event-info .wd-info-icon {
+  color: #b87500;
+}
+.wd-note-info .wd-info-icon {
+  color: var(--text-2);
+}
+.wd-event-list {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.wd-event-line {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 13px;
+}
+.wd-event-title {
+  min-width: 0;
+  overflow: hidden;
+  font-weight: 650;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.wd-event-time {
+  flex: 0 0 auto;
+  color: var(--text-2);
+  font-variant-numeric: tabular-nums;
+  font-size: 12px;
+}
+.wd-empty-info {
+  color: var(--text-3);
+  font-size: 12px;
+}
+.wd-info-section .chips {
+  gap: 6px;
+}
+.wd-info-section .chip.readonly {
+  background: var(--surface);
+  border: 1px solid color-mix(in srgb, var(--primary) 18%, var(--border));
+  color: var(--text);
+}
+.wd-note-info .note-line {
+  color: var(--text-2);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+@media (max-width: 400px) {
+  .wd-card {
+    grid-template-columns: 52px minmax(0, 1fr);
+    column-gap: 11px;
+  }
+  .wd-card-lg {
+    --wd-badge-size: 58px;
+  }
+  .wd-card-md {
+    --wd-badge-size: 50px;
+  }
+  .wd-badge-col .shift-badge {
+    border-radius: 15px;
+  }
+  .wd-event-line {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 1px;
+  }
 }
 
 /* Inside the Overview cards, the badge fills the fixed square column so its

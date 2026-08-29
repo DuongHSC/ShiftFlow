@@ -42,7 +42,7 @@ For a user/organization page or a custom domain, leave `SHIFTFLOW_BASE` unset
 src/
   domain/          pure logic (no storage/UI): models, resolver, rules, seed
   storage/         Dexie DB, repositories, first-run seeding
-  services/        workday, tasks, settings, reminders + composition root
+  services/        workday, tasks, events, settings, reminders + composition root
   import-export/   csv (parse/validate/export), json (full backup/restore)
   ui/              components, screens, navigation (bottom nav)
   styles/          CSS (light mode; structured for future dark mode)
@@ -58,6 +58,8 @@ source of truth for shift schedule resolution.
 - C5 boundary: day 9 normal, 10 special, 20 special, 21 normal (inclusive).
 - WorkDay historical snapshot: config changes never rewrite existing WorkDays.
 - MW / task / note independence: none of them alter resolved shift times.
+- Task assignments (e.g. MW, Ticket) have no time; timed items such as meetings
+  are stored separately as WorkDayEvents.
 - OFF = no WorkDay record for that date.
 - CSV format `Date, Shift, Task, Note` and its import/validate/export behavior.
 

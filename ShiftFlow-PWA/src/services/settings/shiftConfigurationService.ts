@@ -16,6 +16,7 @@ import type {
 import {
   ScheduleRuleRepository,
   ShiftDefinitionRepository,
+  WorkDayRepository,
 } from "@/storage/repositories/repositories";
 import { nowISO } from "@/domain/resolver/datetime";
 import { newId } from "@/services/id";
@@ -27,7 +28,7 @@ export interface ShiftLookupResult {
 
 export class ShiftConfigError extends Error {
   constructor(
-    public code: "emptyCode" | "duplicateCode",
+    public code: "emptyCode" | "duplicateCode" | "shiftInUse" | "notFound",
     message: string,
   ) {
     super(message);
@@ -53,6 +54,7 @@ export class ShiftConfigurationService {
   constructor(
     private shifts: ShiftDefinitionRepository,
     private rules: ScheduleRuleRepository,
+    private workDays?: WorkDayRepository,
   ) {}
 
   allShifts(): Promise<ShiftDefinition[]> {
@@ -127,13 +129,25 @@ export class ShiftConfigurationService {
   /**
    * Deletes a shift definition and its associated schedule rules.
    *
-   * The caller MUST verify the shift is not in use by any WorkDay first
-   * (historical WorkDays must never be cascade-deleted). This method does not
-   * touch WorkDays. Rules belonging to the shift are removed alongside it.
+   * A shift referenced by historical WorkDays is soft-deleted instead:
+   * it is marked inactive while the WorkDay snapshots remain intact.
+   * Unused shifts are removed together with their rules.
    */
-  async deleteShift(id: string): Promise<void> {
+  async deleteShift(id: string): Promise<"deleted" | "deactivated"> {
+    const existing = (await this.shifts.all()).find((s) => s.id === id);
+    if (!existing) {
+      throw new ShiftConfigError("notFound", "Không tìm thấy ca");
+    }
+    if (this.workDays) {
+      const usedBy = (await this.workDays.all()).filter((w) => w.shiftID === id).length;
+      if (usedBy > 0) {
+        await this.shifts.put({ ...existing, isActive: false, modifiedAt: nowISO() });
+        return "deactivated";
+      }
+    }
     const rules = (await this.rules.all()).filter((r) => r.shiftID === id);
     for (const r of rules) await this.rules.delete(r.id);
     await this.shifts.delete(id);
+    return "deleted";
   }
 }

@@ -15,6 +15,7 @@ import {
   colorForCode,
   longDate,
   monthName,
+  shiftTitle,
   shiftBadge,
   timeFromISO,
   type ShiftColorMap,
@@ -40,7 +41,8 @@ export async function renderCalendar(ctx: ScreenContext): Promise<HTMLElement> {
   const jsDow = first.getDay();
   const leading = (jsDow + 6) % 7; // Monday-first offset
 
-  const colors = buildShiftColorMap(await app.configService.allShifts());
+  const shifts = await app.configService.allShifts();
+  const colors = buildShiftColorMap(shifts);
   const workDays = await app.workDayService.byDateRange(
     new Date(viewYear, viewMonth, 1),
     new Date(viewYear, viewMonth, daysInMonth),
@@ -63,6 +65,9 @@ export async function renderCalendar(ctx: ScreenContext): Promise<HTMLElement> {
   const selectedTaskCodes = selectedWorkDay
     ? (await app.taskService.visibleTasksForWorkDay(selectedWorkDay.id)).map((t) => t.code)
     : [];
+  const selectedEvents = selectedWorkDay
+    ? await app.eventService.forWorkDay(selectedWorkDay.id)
+    : [];
 
   const grid = el("div", { class: "cal-grid" }, [
     ...WEEKDAY_LABELS.map((w) => el("div", { class: "cal-weekday", text: w })),
@@ -79,7 +84,7 @@ export async function renderCalendar(ctx: ScreenContext): Promise<HTMLElement> {
         "button",
         {
           class: `cal-cell${isToday ? " today" : ""}${isSelected ? " selected" : ""}`,
-          "aria-label": `Ngày ${day}${w ? `, ca ${w.shiftCode}` : ", OFF"}${isToday ? ", hôm nay" : ""}${isSelected ? ", đang chọn" : ""}`,
+          "aria-label": `Ngày ${day}${w ? `, ca ${shiftTitle(w.shiftCode, shifts)}` : ", OFF"}${isToday ? ", hôm nay" : ""}${isSelected ? ", đang chọn" : ""}`,
           "aria-pressed": isSelected ? "true" : "false",
           // Single click/tap = SELECT ONLY (shows the summary below).
           onClick: () => {
@@ -98,7 +103,7 @@ export async function renderCalendar(ctx: ScreenContext): Promise<HTMLElement> {
             ? el("span", {
                 class: "cell-code",
                 style: `color:${tint}`,
-                text: w.shiftCode,
+                text: shiftTitle(w.shiftCode, shifts),
               })
             : el("span", { class: "cell-code off-code", text: "OFF" }),
           w
@@ -125,7 +130,7 @@ export async function renderCalendar(ctx: ScreenContext): Promise<HTMLElement> {
       el("span", { text: "● Hôm nay · ▭ Đang chọn · Chạm 2 lần để xem" }),
     ]),
     selectedISO
-      ? selectedDetailCard(selectedISO, selectedWorkDay, selectedTaskCodes, colors, ctx)
+      ? selectedDetailCard(selectedISO, selectedWorkDay, selectedTaskCodes, selectedEvents, shifts, colors, ctx)
       : el("div", { class: "empty-state", text: "Chọn một ngày để xem chi tiết." }),
   ]);
 }
@@ -149,6 +154,8 @@ function selectedDetailCard(
   iso: string,
   w: WorkDay | undefined,
   taskCodes: string[],
+  events: { title: string; startTime: string; endTime: string }[],
+  shifts: Awaited<ReturnType<typeof app.configService.allShifts>>,
   colors: ShiftColorMap,
   ctx: ScreenContext,
 ): HTMLElement {
@@ -156,12 +163,45 @@ function selectedDetailCard(
   return el("div", { class: "card" }, [
     el("div", { style: "font-weight:700;margin-bottom:10px", text: longDate(d) }),
     w
-      ? el("div", { class: "row", style: "align-items:center" }, [
+      ? el("div", { class: "row", style: "align-items:flex-start" }, [
           shiftBadge(w.shiftCode, colors, { size: "md" }),
-          el("div", { class: "stack", style: "flex:1;margin-left:12px;gap:3px" }, [
+          el("div", { class: "stack calendar-detail-content", style: "flex:1;margin-left:12px;gap:10px" }, [
+            el("div", { class: "shift-title", text: shiftTitle(w.shiftCode, shifts) }),
             el("div", { class: "time", style: "font-size:18px", text: `${timeFromISO(w.resolvedStartDateTime)} – ${timeFromISO(w.resolvedEndDateTime)}` }),
-            el("div", { class: "muted", text: taskCodes.length ? `Task: ${taskCodes.join(", ")}` : "Không có task" }),
-            el("div", { class: "muted", text: w.note ? `Ghi chú: ${w.note}` : "Không có ghi chú" }),
+            el("div", { class: "wd-info-grid" }, [
+              el("div", { class: "wd-info-section wd-task-info" }, [
+                el("div", { class: "wd-info-label" }, [
+                  el("span", { class: "wd-info-icon", text: "✓", "aria-hidden": "true" }),
+                  el("span", { text: "Task" }),
+                ]),
+                taskCodes.length
+                  ? el("div", { class: "chips" }, taskCodes.map((code) => el("span", { class: "chip readonly", text: code })))
+                  : el("div", { class: "wd-empty-info", text: "Chưa có task" }),
+              ]),
+              el("div", { class: "wd-info-section wd-event-info" }, [
+                el("div", { class: "wd-info-label" }, [
+                  el("span", { class: "wd-info-icon", text: "◷", "aria-hidden": "true" }),
+                  el("span", { text: "Công việc" }),
+                ]),
+                events.length
+                  ? el("div", { class: "wd-event-list" }, events.map((event) =>
+                      el("div", { class: "wd-event-line" }, [
+                        el("span", { class: "wd-event-title", text: event.title }),
+                        el("span", { class: "wd-event-time", text: `${event.startTime}–${event.endTime}` }),
+                      ]),
+                    ))
+                  : el("div", { class: "wd-empty-info", text: "Chưa có công việc" }),
+              ]),
+              w.note
+                ? el("div", { class: "wd-info-section wd-note-info" }, [
+                    el("div", { class: "wd-info-label" }, [
+                      el("span", { class: "wd-info-icon", text: "✎", "aria-hidden": "true" }),
+                      el("span", { text: "Ghi chú" }),
+                    ]),
+                    el("div", { class: "note-line", text: w.note }),
+                  ])
+                : null,
+            ]),
           ]),
         ])
       : el("div", { class: "row", style: "align-items:center" }, [

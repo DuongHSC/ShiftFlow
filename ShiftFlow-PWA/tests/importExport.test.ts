@@ -21,10 +21,11 @@ import { CsvService } from "@/import-export/csv/csvService";
 import {
   applyBackup,
   buildBackup,
+  clearAllData,
   exportBackupJson,
   parseBackup,
 } from "@/import-export/json/jsonBackup";
-import { parseCsv, validateCsv } from "@/import-export/csv/csv";
+import { parseCsv, shiftAliasKey, validateCsv } from "@/import-export/csv/csv";
 import { SEED_IDS } from "@/domain/seed/seed";
 
 let dbCounter = 0;
@@ -49,6 +50,25 @@ beforeEach(() => {
 });
 
 describe("JSON backup round-trip", () => {
+  it("clearAllData removes every persistent store", async () => {
+    const db = new ShiftFlowDB(name);
+    await seedIfNeeded(db);
+    const s = build(db);
+    const c1 = await s.config.lookup("C1");
+    await s.workDays.create(new Date(2026, 7, 29), c1!.shift, c1!.rules, "note");
+    await s.tasks.addTask(SEED_IDS.mw, (await s.workDays.byDate(new Date(2026, 7, 29)))!.id);
+
+    await clearAllData(db);
+
+    expect(await db.workDays.count()).toBe(0);
+    expect(await db.shiftDefinitions.count()).toBe(0);
+    expect(await db.scheduleRules.count()).toBe(0);
+    expect(await db.taskDefinitions.count()).toBe(0);
+    expect(await db.workDayTasks.count()).toBe(0);
+    expect(await db.workDayEvents.count()).toBe(0);
+    expect(await db.reminders.count()).toBe(0);
+  });
+
   it("export then import into a fresh DB reproduces WorkDays", async () => {
     const db1 = new ShiftFlowDB(name);
     await seedIfNeeded(db1);
@@ -78,7 +98,7 @@ describe("JSON backup round-trip", () => {
     expect(await s2.tasks.hasTask(restored!.id)).toBe(true);
   });
 
-  it("backup includes all six stores", async () => {
+  it("backup includes all seven stores", async () => {
     const db = new ShiftFlowDB(name);
     await seedIfNeeded(db);
     const backup = await buildBackup(db);
@@ -88,6 +108,7 @@ describe("JSON backup round-trip", () => {
         "scheduleRules",
         "shiftDefinitions",
         "taskDefinitions",
+        "workDayEvents",
         "workDayTasks",
         "workDays",
       ].sort(),
@@ -130,6 +151,18 @@ describe("CSV compatibility", () => {
     const validated = validateCsv(rows, { existingWorkDayDates: new Set() });
     expect(validated[0].status.kind).toBe("valid");
     expect(validated[0].shiftCode).toBe("OFF");
+  });
+
+  it("accepts renamed shift names and blank shift cells as OFF", () => {
+    const rows = parseCsv(
+      "Date,Shift,Task\n01/09/2026,Ca 5,\n02/09/2026,Ca5,MW\n03/09/2026,,\n",
+    );
+    const validated = validateCsv(rows, {
+      existingWorkDayDates: new Set(),
+      knownShiftAliases: new Map([[shiftAliasKey("Ca 5"), "C5"]]),
+    });
+    expect(validated.map((row) => row.shiftCode)).toEqual(["C5", "C5", "OFF"]);
+    expect(validated.every((row) => row.status.kind === "valid")).toBe(true);
   });
 
   it("export then re-import produces the same WorkDay set (round-trip)", async () => {

@@ -17,8 +17,10 @@ import type {
   ShiftDefinition,
   TaskDefinition,
   WorkDay,
+  WorkDayEvent,
   WorkDayTask,
 } from "@/domain/models/models";
+import { newId } from "@/services/id";
 
 export class ShiftFlowDB extends Dexie {
   workDays!: Table<WorkDay, string>;
@@ -26,6 +28,7 @@ export class ShiftFlowDB extends Dexie {
   scheduleRules!: Table<ScheduleRule, string>;
   taskDefinitions!: Table<TaskDefinition, string>;
   workDayTasks!: Table<WorkDayTask, string>;
+  workDayEvents!: Table<WorkDayEvent, string>;
   reminders!: Table<ReminderConfiguration, string>;
 
   constructor(name = "shiftflow") {
@@ -61,6 +64,66 @@ export class ShiftFlowDB extends Dexie {
           .modify((wt: { isVisible?: boolean }) => {
             if (wt.isVisible === undefined) wt.isVisible = true;
           });
+      });
+
+    // v3: separates concrete timed work items (WorkDayEvent) from task tags
+    // (WorkDayTask). Existing task assignments are preserved.
+    this.version(3).stores({
+      workDays: "id, &date, shiftID, modifiedAt",
+      shiftDefinitions: "id, code, isActive",
+      scheduleRules: "id, shiftID, priority, isActive",
+      taskDefinitions: "id, code, isActive",
+      workDayTasks: "id, workDayID, taskDefinitionID",
+      workDayEvents: "id, workDayID, startTime, modifiedAt",
+      reminders: "id, workDayID",
+    });
+
+    // v4: migrate legacy timed task assignments into concrete work events.
+    // The Task assignment itself is intentionally preserved; only its old
+    // timing/reminder metadata is copied to WorkDayEvent.
+    this.version(4)
+      .stores({
+        workDays: "id, &date, shiftID, modifiedAt",
+        shiftDefinitions: "id, code, isActive",
+        scheduleRules: "id, shiftID, priority, isActive",
+        taskDefinitions: "id, code, isActive",
+        workDayTasks: "id, workDayID, taskDefinitionID",
+        workDayEvents: "id, workDayID, startTime, modifiedAt",
+        reminders: "id, workDayID",
+      })
+      .upgrade(async (tx) => {
+        const [assignments, definitions] = await Promise.all([
+          tx.table("workDayTasks").toArray(),
+          tx.table("taskDefinitions").toArray(),
+        ]);
+        const taskById = new Map(
+          definitions.map((task: { id: string; code: string; name: string }) => [task.id, task]),
+        );
+        const events = tx.table("workDayEvents");
+        const now = new Date().toISOString();
+        for (const assignment of assignments as {
+          id: string;
+          workDayID: string;
+          taskDefinitionID: string;
+          startTime?: string | null;
+          endTime?: string | null;
+          reminderEnabled?: boolean;
+          reminderOffset?: string | null;
+        }[]) {
+          if (!assignment.startTime || !assignment.endTime) continue;
+          const task = taskById.get(assignment.taskDefinitionID);
+          await events.add({
+            id: newId(),
+            workDayID: assignment.workDayID,
+            title: task?.name ?? task?.code ?? "Công việc",
+            startTime: assignment.startTime,
+            endTime: assignment.endTime,
+            reminderEnabled: assignment.reminderEnabled ?? false,
+            reminderOffset: assignment.reminderOffset ?? null,
+            createdAt: now,
+            modifiedAt: now,
+          });
+        }
       });
   }
 }

@@ -58,6 +58,24 @@ export function colorForCode(code: string, colors?: ShiftColorMap): string {
   return colors?.get(c) ?? OFF_COLOR;
 }
 
+/** Returns the current display name for a shift code, falling back to code. */
+export function shiftName(
+  code: string,
+  shifts: Pick<ShiftDefinition, "code" | "name">[],
+): string {
+  const normalized = (code || "").trim().toUpperCase();
+  const shift = shifts.find((s) => s.code.toUpperCase() === normalized);
+  return shift?.name?.trim() || code;
+}
+
+/** Compact human-readable title used on schedule cards. */
+export function shiftTitle(
+  code: string,
+  shifts: Pick<ShiftDefinition, "code" | "name">[],
+): string {
+  return shiftName(code, shifts);
+}
+
 /**
  * Builds a shift badge element. Color comes from the definitions map (not
  * hard-coded). The CODE text is always shown so shifts are distinguishable

@@ -44,6 +44,7 @@ async function makeCtx(): Promise<Ctx> {
   const config = new ShiftConfigurationService(
     new ShiftDefinitionRepository(db),
     new ScheduleRuleRepository(db),
+    new WorkDayRepository(db),
   );
   return { db, workDays, tasks, config };
 }
@@ -140,6 +141,16 @@ describe("task visibility", () => {
     expect(fireDate?.getHours()).toBe(13);
     expect(fireDate?.getMinutes()).toBe(30);
   });
+
+  it("task deletion deactivates an assigned task and keeps old assignment", async () => {
+    const wd = await createC5(ctx);
+    const task = await ctx.tasks.createTask("OldTask", "Old task");
+    await ctx.tasks.addTask(task.id, wd.id);
+
+    await expect(ctx.tasks.deleteTask(task.id)).resolves.toBe("deactivated");
+    expect((await ctx.tasks.allTasks()).find((t) => t.id === task.id)?.isActive).toBe(false);
+    expect((await ctx.tasks.tasksForWorkDay(wd.id)).map((t) => t.code)).toContain("OldTask");
+  });
 });
 
 describe("shift CRUD", () => {
@@ -198,12 +209,13 @@ describe("shift CRUD", () => {
     expect((await ctx.config.allShifts()).some((s) => s.id === created.id)).toBe(false);
   });
 
-  it("shift-delete protection: caller must check usage (WorkDay count) before deleting", async () => {
-    // The UI guards deletion by counting WorkDays using the shift; verify that
-    // count is discoverable so historical WorkDays are never cascade-deleted.
+  it("shift deletion deactivates an assigned shift and keeps history", async () => {
     const wd = await createC5(ctx);
     const c5Id = wd.shiftID;
     const usedBy = (await ctx.workDays.all()).filter((w) => w.shiftID === c5Id).length;
     expect(usedBy).toBeGreaterThan(0);
+    await expect(ctx.config.deleteShift(c5Id)).resolves.toBe("deactivated");
+    expect((await ctx.config.allShifts()).find((s) => s.id === c5Id)?.isActive).toBe(false);
+    expect(await ctx.workDays.byId(wd.id)).toBeDefined();
   });
 });

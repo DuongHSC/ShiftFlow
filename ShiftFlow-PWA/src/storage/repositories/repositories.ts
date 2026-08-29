@@ -11,6 +11,7 @@ import type {
   ShiftDefinition,
   TaskDefinition,
   WorkDay,
+  WorkDayEvent,
   WorkDayTask,
 } from "@/domain/models/models";
 
@@ -114,6 +115,29 @@ export class WorkDayTaskRepository {
       .equals(workDayID)
       .primaryKeys();
     await this.db.workDayTasks.bulkDelete(keys);
+  }
+}
+
+export class WorkDayEventRepository {
+  constructor(private db: ShiftFlowDB) {}
+  all(): Promise<WorkDayEvent[]> {
+    return this.db.workDayEvents.toArray();
+  }
+  forWorkDay(workDayID: string): Promise<WorkDayEvent[]> {
+    return this.db.workDayEvents.where("workDayID").equals(workDayID).toArray();
+  }
+  put(event: WorkDayEvent): Promise<string> {
+    return this.db.workDayEvents.put(event);
+  }
+  delete(id: string): Promise<void> {
+    return this.db.workDayEvents.delete(id);
+  }
+  async deleteForWorkDay(workDayID: string): Promise<void> {
+    const keys = await this.db.workDayEvents
+      .where("workDayID")
+      .equals(workDayID)
+      .primaryKeys();
+    await this.db.workDayEvents.bulkDelete(keys);
   }
 }
 

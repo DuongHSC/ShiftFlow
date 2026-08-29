@@ -118,4 +118,17 @@ describe("Overview reads the single source of truth (3 days)", () => {
     chips = Array.from(node.querySelectorAll(".chip.readonly")).map((c) => c.textContent);
     expect(chips).toContain("Ticket");
   });
+
+  it("shows the latest configured shift name for an existing WorkDay", async () => {
+    const lookup = (await app.configService.lookup("C5"))!;
+    const original = { ...lookup.shift };
+    await app.workDayService.create(dayOffset(0), lookup.shift, lookup.rules);
+    try {
+      await app.configService.updateShift({ ...original, name: "Ca 5 chiều" });
+      const node = await renderUpcoming(noopCtx);
+      expect(node.textContent).toContain("Ca 5 chiều");
+    } finally {
+      await app.configService.updateShift(original);
+    }
+  });
 });

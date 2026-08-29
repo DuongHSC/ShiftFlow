@@ -7,7 +7,7 @@
 //
 // Stores included (mirror the iOS persistent model + PWA-persisted reminders):
 //   workDays, shiftDefinitions, scheduleRules, taskDefinitions,
-//   workDayTasks, reminders
+//   workDayTasks, workDayEvents, reminders
 
 import type { ShiftFlowDB } from "@/storage/db/db";
 import type {
@@ -16,6 +16,7 @@ import type {
   ShiftDefinition,
   TaskDefinition,
   WorkDay,
+  WorkDayEvent,
   WorkDayTask,
 } from "@/domain/models/models";
 
@@ -32,6 +33,7 @@ export interface ShiftFlowBackup {
     scheduleRules: ScheduleRule[];
     taskDefinitions: TaskDefinition[];
     workDayTasks: WorkDayTask[];
+    workDayEvents: WorkDayEvent[];
     reminders: ReminderConfiguration[];
   };
 }
@@ -44,6 +46,7 @@ export async function buildBackup(db: ShiftFlowDB): Promise<ShiftFlowBackup> {
     scheduleRules,
     taskDefinitions,
     workDayTasks,
+    workDayEvents,
     reminders,
   ] = await Promise.all([
     db.workDays.toArray(),
@@ -51,6 +54,7 @@ export async function buildBackup(db: ShiftFlowDB): Promise<ShiftFlowBackup> {
     db.scheduleRules.toArray(),
     db.taskDefinitions.toArray(),
     db.workDayTasks.toArray(),
+    db.workDayEvents.toArray(),
     db.reminders.toArray(),
   ]);
 
@@ -67,6 +71,7 @@ export async function buildBackup(db: ShiftFlowDB): Promise<ShiftFlowBackup> {
       scheduleRules: byId(scheduleRules),
       taskDefinitions: byId(taskDefinitions),
       workDayTasks: byId(workDayTasks),
+      workDayEvents: byId(workDayEvents),
       reminders: byId(reminders),
     },
   };
@@ -112,6 +117,7 @@ export function parseBackup(content: string): ShiftFlowBackup {
     ["scheduleRules", d.scheduleRules],
     ["taskDefinitions", d.taskDefinitions],
     ["workDayTasks", d.workDayTasks],
+    ["workDayEvents", d.workDayEvents],
     ["reminders", d.reminders],
   ];
   for (const [key, val] of arrays) {
@@ -130,6 +136,7 @@ export function parseBackup(content: string): ShiftFlowBackup {
       scheduleRules: d.scheduleRules ?? [],
       taskDefinitions: d.taskDefinitions ?? [],
       workDayTasks: d.workDayTasks ?? [],
+      workDayEvents: d.workDayEvents ?? [],
       reminders: d.reminders ?? [],
     },
   };
@@ -137,12 +144,40 @@ export function parseBackup(content: string): ShiftFlowBackup {
 
 export type BackupImportMode = "replace" | "merge";
 
+/** Permanently clears every IndexedDB store used by ShiftFlow. */
+export async function clearAllData(db: ShiftFlowDB): Promise<void> {
+  await db.transaction(
+    "rw",
+    [
+      db.workDays,
+      db.shiftDefinitions,
+      db.scheduleRules,
+      db.taskDefinitions,
+      db.workDayTasks,
+      db.workDayEvents,
+      db.reminders,
+    ],
+    async () => {
+      await Promise.all([
+        db.workDays.clear(),
+        db.shiftDefinitions.clear(),
+        db.scheduleRules.clear(),
+        db.taskDefinitions.clear(),
+        db.workDayTasks.clear(),
+        db.workDayEvents.clear(),
+        db.reminders.clear(),
+      ]);
+    },
+  );
+}
+
 export interface BackupImportSummary {
   workDays: number;
   shiftDefinitions: number;
   scheduleRules: number;
   taskDefinitions: number;
   workDayTasks: number;
+  workDayEvents: number;
   reminders: number;
   mode: BackupImportMode;
 }
@@ -174,6 +209,7 @@ export async function applyBackup(
       db.scheduleRules,
       db.taskDefinitions,
       db.workDayTasks,
+      db.workDayEvents,
       db.reminders,
     ],
     async () => {
@@ -184,6 +220,7 @@ export async function applyBackup(
           db.scheduleRules.clear(),
           db.taskDefinitions.clear(),
           db.workDayTasks.clear(),
+          db.workDayEvents.clear(),
           db.reminders.clear(),
         ]);
       } else {
@@ -202,6 +239,7 @@ export async function applyBackup(
       await db.taskDefinitions.bulkPut(d.taskDefinitions);
       await db.workDays.bulkPut(d.workDays);
       await db.workDayTasks.bulkPut(d.workDayTasks);
+      await db.workDayEvents.bulkPut(d.workDayEvents);
       await db.reminders.bulkPut(d.reminders);
     },
   );
@@ -212,6 +250,7 @@ export async function applyBackup(
     scheduleRules: d.scheduleRules.length,
     taskDefinitions: d.taskDefinitions.length,
     workDayTasks: d.workDayTasks.length,
+    workDayEvents: d.workDayEvents.length,
     reminders: d.reminders.length,
     mode,
   };
