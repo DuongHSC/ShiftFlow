@@ -1,0 +1,202 @@
+// ShiftFlow PWA — Services
+// services/tasks/taskService.ts
+//
+// Task definitions + WorkDay↔task assignments. Ported from iOS TaskService.
+//
+// CRITICAL INVARIANTS:
+// - Task operations NEVER resolve shifts.
+// - Task operations NEVER modify WorkDay resolved snapshots.
+// - Task is NEVER stored in WorkDay.note.
+
+import type { TaskDefinition, WorkDayTask } from "@/domain/models/models";
+import {
+  TaskDefinitionRepository,
+  WorkDayTaskRepository,
+} from "@/storage/repositories/repositories";
+import { nowISO } from "@/domain/resolver/datetime";
+import { newId } from "@/services/id";
+
+export class TaskError extends Error {
+  constructor(
+    public code:
+      | "emptyCode"
+      | "emptyName"
+      | "duplicateCode"
+      | "notFound"
+      | "taskInUse",
+    message: string,
+  ) {
+    super(message);
+    this.name = "TaskError";
+  }
+}
+
+export class TaskService {
+  constructor(
+    private defs: TaskDefinitionRepository,
+    private assigns: WorkDayTaskRepository,
+  ) {}
+
+  allTasks(): Promise<TaskDefinition[]> {
+    return this.defs.all();
+  }
+
+  async activeTasks(): Promise<TaskDefinition[]> {
+    return (await this.defs.all())
+      .filter((t) => t.isActive)
+      .sort((a, b) => a.code.localeCompare(b.code));
+  }
+
+  async taskByCode(code: string): Promise<TaskDefinition | undefined> {
+    const upper = code.toUpperCase();
+    return (await this.defs.all()).find((t) => t.code.toUpperCase() === upper);
+  }
+
+  async createTask(code: string, name: string): Promise<TaskDefinition> {
+    const c = code.trim();
+    const n = name.trim();
+    if (!c) throw new TaskError("emptyCode", "Mã task không được để trống");
+    if (!n) throw new TaskError("emptyName", "Tên task không được để trống");
+    const all = await this.defs.all();
+    if (all.some((t) => t.code.toUpperCase() === c.toUpperCase())) {
+      throw new TaskError("duplicateCode", `Mã task đã tồn tại: ${c}`);
+    }
+    const now = nowISO();
+    const task: TaskDefinition = {
+      id: newId(),
+      code: c,
+      name: n,
+      isActive: true,
+      createdAt: now,
+      modifiedAt: now,
+    };
+    await this.defs.put(task);
+    return task;
+  }
+
+  async setActive(id: string, isActive: boolean): Promise<void> {
+    const all = await this.defs.all();
+    const existing = all.find((t) => t.id === id);
+    if (!existing) throw new TaskError("notFound", "Không tìm thấy task");
+    await this.defs.put({ ...existing, isActive, modifiedAt: nowISO() });
+  }
+
+  /** Deletes a task; refuses if referenced by any assignment (preserve history). */
+  async deleteTask(id: string): Promise<void> {
+    const all = await this.defs.all();
+    const existing = all.find((t) => t.id === id);
+    if (!existing) throw new TaskError("notFound", "Không tìm thấy task");
+    const referenced = (await this.assigns.all()).some(
+      (a) => a.taskDefinitionID === id,
+    );
+    if (referenced) {
+      throw new TaskError("taskInUse", `Task đang được sử dụng: ${existing.code}`);
+    }
+    await this.defs.delete(id);
+  }
+
+  // MARK: assignments
+
+  /** All assigned task definitions for a WorkDay (visible + hidden). */
+  async tasksForWorkDay(workDayID: string): Promise<TaskDefinition[]> {
+    const joins = await this.assigns.forWorkDay(workDayID);
+    const all = await this.defs.all();
+    const byId = new Map(all.map((t) => [t.id, t]));
+    return joins
+      .map((j) => byId.get(j.taskDefinitionID))
+      .filter((t): t is TaskDefinition => !!t);
+  }
+
+  /**
+   * Assigned tasks paired with their assignment (incl. visibility). This is the
+   * single source of truth Overview and Calendar read from. `isVisible`
+   * defaults to true for records created before the field existed.
+   */
+  async assignmentsForWorkDay(
+    workDayID: string,
+  ): Promise<{ task: TaskDefinition; assignment: WorkDayTask; isVisible: boolean }[]> {
+    const joins = await this.assigns.forWorkDay(workDayID);
+    const all = await this.defs.all();
+    const byId = new Map(all.map((t) => [t.id, t]));
+    const out: { task: TaskDefinition; assignment: WorkDayTask; isVisible: boolean }[] = [];
+    for (const j of joins) {
+      const task = byId.get(j.taskDefinitionID);
+      if (task) out.push({ task, assignment: j, isVisible: j.isVisible !== false });
+    }
+    return out;
+  }
+
+  /** Only VISIBLE assigned task definitions (read surfaces: Overview, Calendar). */
+  async visibleTasksForWorkDay(workDayID: string): Promise<TaskDefinition[]> {
+    return (await this.assignmentsForWorkDay(workDayID))
+      .filter((a) => a.isVisible)
+      .map((a) => a.task);
+  }
+
+  async hasTask(workDayID: string): Promise<boolean> {
+    return (await this.assigns.forWorkDay(workDayID)).length > 0;
+  }
+
+  /** Whether a WorkDay has at least one VISIBLE assigned task. */
+  async hasVisibleTask(workDayID: string): Promise<boolean> {
+    return (await this.visibleTasksForWorkDay(workDayID)).length > 0;
+  }
+
+  /** Idempotent: no duplicate join for the same (workDay, task) pair. New assignments are visible. */
+  async addTask(taskDefinitionID: string, workDayID: string): Promise<void> {
+    const existing = await this.assigns.forWorkDay(workDayID);
+    if (existing.some((a) => a.taskDefinitionID === taskDefinitionID)) return;
+    const now = nowISO();
+    const join: WorkDayTask = {
+      id: newId(),
+      workDayID,
+      taskDefinitionID,
+      isVisible: true,
+      createdAt: now,
+      modifiedAt: now,
+    };
+    await this.assigns.put(join);
+  }
+
+  /**
+   * Hides/unhides a task assignment WITHOUT deleting it. This is the only
+   * visibility control — there is no per-screen preference. No-op if the pair
+   * is not assigned.
+   */
+  async setTaskVisibility(
+    taskDefinitionID: string,
+    workDayID: string,
+    isVisible: boolean,
+  ): Promise<void> {
+    const joins = (await this.assigns.forWorkDay(workDayID)).filter(
+      (a) => a.taskDefinitionID === taskDefinitionID,
+    );
+    for (const j of joins) {
+      await this.assigns.put({ ...j, isVisible, modifiedAt: nowISO() });
+    }
+  }
+
+  async removeTask(taskDefinitionID: string, workDayID: string): Promise<void> {
+    const joins = (await this.assigns.forWorkDay(workDayID)).filter(
+      (a) => a.taskDefinitionID === taskDefinitionID,
+    );
+    for (const j of joins) await this.assigns.delete(j.id);
+  }
+
+  async removeAllTasks(workDayID: string): Promise<void> {
+    await this.assigns.deleteForWorkDay(workDayID);
+  }
+
+  async workDayIDsWithTasks(): Promise<Set<string>> {
+    return new Set((await this.assigns.all()).map((a) => a.workDayID));
+  }
+
+  /** WorkDay IDs that have at least one VISIBLE assigned task (calendar dots). */
+  async workDayIDsWithVisibleTasks(): Promise<Set<string>> {
+    return new Set(
+      (await this.assigns.all())
+        .filter((a) => a.isVisible !== false)
+        .map((a) => a.workDayID),
+    );
+  }
+}
