@@ -33,7 +33,7 @@ export async function openDayDetail(
   const existing = await app.workDayService.byDate(date);
   const shifts = await app.configService.activeShifts();
   const allRules = await app.configService.allRules();
-  const allTasks = await app.taskService.activeTasks();
+  let allTasks = await app.taskService.activeTasks();
   const colors = buildShiftColorMap(shifts);
 
   // Synchronous shift lookup from the config loaded when the sheet opened.
@@ -94,6 +94,7 @@ export async function openDayDetail(
   const reminder = existing ? await app.reminderService.forWorkDay(existing.id) : undefined;
   let reminderEnabled = reminder?.isEnabled ?? false;
   let reminderOffset: ReminderOffset = reminder?.offset ?? "2h";
+  let isAddingTask = false;
 
   const backdrop = el("div", { class: "sheet-backdrop", role: "dialog", "aria-modal": "true" });
   const sheet = el("div", { class: "sheet" });
@@ -475,7 +476,70 @@ export async function openDayDetail(
         : [],
     );
 
-    return el("div", {}, [list, add]);
+    const addNew = isAddingTask ? newTaskForm() : el("button", {
+      class: "btn ghost block",
+      style: "margin-top:10px",
+      text: "+ Công việc",
+      onClick: () => {
+        isAddingTask = true;
+        void render();
+      },
+    });
+
+    return el("div", {}, [list, add, addNew]);
+  }
+
+  function newTaskForm(): HTMLElement {
+    const codeInput = el("input", {
+      type: "text",
+      placeholder: "Mã (vd: Meeting)",
+    });
+    const nameInput = el("input", {
+      type: "text",
+      placeholder: "Tên hiển thị",
+    });
+
+    const create = async () => {
+      try {
+        const code = (codeInput as HTMLInputElement).value.trim();
+        const name = (nameInput as HTMLInputElement).value.trim() || code;
+        const created = await app.taskService.createTask(code, name);
+        allTasks = await app.taskService.activeTasks();
+        taskState.set(created.id, {
+          assigned: true,
+          visible: true,
+          startTime: "",
+          endTime: "",
+          reminderEnabled: false,
+          reminderOffset: "30min",
+        });
+        isAddingTask = false;
+        toast(`Đã thêm ${created.code}`);
+        void render();
+      } catch (err) {
+        toast(err instanceof Error ? err.message : "Thêm công việc thất bại");
+      }
+    };
+
+    return el("div", { class: "card tight inline-task-form", style: "margin-top:10px" }, [
+      field("Mã công việc", codeInput),
+      field("Tên", nameInput),
+      el("div", { class: "btn-row" }, [
+        el("button", {
+          class: "btn ghost block",
+          text: "Hủy",
+          onClick: () => {
+            isAddingTask = false;
+            void render();
+          },
+        }),
+        el("button", {
+          class: "btn primary block",
+          text: "Thêm",
+          onClick: () => void create(),
+        }),
+      ]),
+    ]);
   }
 
   function assignedTaskRow(t: TaskDefinition): HTMLElement {
@@ -629,4 +693,8 @@ function timeCol(label: string, value: string): HTMLElement {
     el("div", { class: "time-label", text: label }),
     el("div", { class: "time", text: value }),
   ]);
+}
+
+function field(label: string, input: HTMLElement): HTMLElement {
+  return el("label", { class: "field" }, [el("span", { text: label }), input]);
 }

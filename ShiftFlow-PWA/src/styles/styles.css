@@ -925,6 +925,10 @@ label.field.compact input {
 .task-reminder-row select {
   padding: 9px;
 }
+.inline-task-form {
+  border: 1px solid var(--border);
+  box-shadow: none;
+}
 
 @media (max-width: 400px) {
   .task-time-grid,

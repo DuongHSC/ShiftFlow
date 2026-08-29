@@ -79,6 +79,30 @@ describe("Day Edit — single Save action", () => {
     expect(wd).toBeDefined();
     expect(refreshed).toBeGreaterThan(0);
   });
+
+  it("EDIT screen can create a new task inline", async () => {
+    const inlineCode = `Inline${Date.now()}`;
+    await openDayDetail(FIXTURE_ISO, () => {}, { mode: "edit" });
+    let sheet = document.querySelector(".sheet")!;
+    buttonsByText(sheet, "+ Công việc")[0].click();
+    await new Promise((r) => setTimeout(r, 0));
+
+    sheet = document.querySelector(".sheet")!;
+    expect(sheet.textContent).toContain("Mã công việc");
+    const form = sheet.querySelector(".inline-task-form")!;
+    const inputs = Array.from(form.querySelectorAll<HTMLInputElement>('input[type="text"]'));
+    inputs[0].value = inlineCode;
+    inputs[1].value = "Inline Meeting";
+    buttonsByText(form, "Thêm")[0].click();
+    for (let i = 0; i < 20; i += 1) {
+      await new Promise((r) => setTimeout(r, 5));
+      if (await app.taskService.taskByCode(inlineCode)) break;
+    }
+
+    sheet = document.querySelector(".sheet")!;
+    expect(sheet.textContent).toContain(inlineCode);
+    expect(await app.taskService.taskByCode(inlineCode)).toBeTruthy();
+  });
 });
 
 describe("Day Edit — delete confirmation", () => {
