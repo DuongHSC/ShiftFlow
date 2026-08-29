@@ -176,6 +176,26 @@ export class TaskService {
     }
   }
 
+  async setTaskDetails(
+    taskDefinitionID: string,
+    workDayID: string,
+    details: Pick<
+      WorkDayTask,
+      "startTime" | "endTime" | "reminderEnabled" | "reminderOffset"
+    >,
+  ): Promise<void> {
+    const joins = (await this.assigns.forWorkDay(workDayID)).filter(
+      (a) => a.taskDefinitionID === taskDefinitionID,
+    );
+    for (const j of joins) {
+      await this.assigns.put({
+        ...j,
+        ...details,
+        modifiedAt: nowISO(),
+      });
+    }
+  }
+
   async removeTask(taskDefinitionID: string, workDayID: string): Promise<void> {
     const joins = (await this.assigns.forWorkDay(workDayID)).filter(
       (a) => a.taskDefinitionID === taskDefinitionID,

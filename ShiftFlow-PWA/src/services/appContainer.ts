@@ -18,6 +18,7 @@ import { seedIfNeeded } from "@/storage/seeding";
 import { WorkDayService } from "@/services/workday/workDayService";
 import { TaskService } from "@/services/tasks/taskService";
 import { ReminderService } from "@/services/reminders/reminderService";
+import { NotificationScheduler } from "@/services/reminders/notificationScheduler";
 import { ShiftConfigurationService } from "@/services/settings/shiftConfigurationService";
 import { CsvService } from "@/import-export/csv/csvService";
 
@@ -26,6 +27,7 @@ export class AppContainer {
   readonly workDayService: WorkDayService;
   readonly taskService: TaskService;
   readonly reminderService: ReminderService;
+  readonly notificationScheduler: NotificationScheduler;
   readonly configService: ShiftConfigurationService;
   readonly csvService: CsvService;
 
@@ -43,6 +45,7 @@ export class AppContainer {
     this.workDayService = new WorkDayService(workDayRepo);
     this.taskService = new TaskService(taskDefRepo, assignRepo);
     this.reminderService = new ReminderService(reminderRepo);
+    this.notificationScheduler = new NotificationScheduler(db);
     this.csvService = new CsvService(
       this.workDayService,
       this.taskService,

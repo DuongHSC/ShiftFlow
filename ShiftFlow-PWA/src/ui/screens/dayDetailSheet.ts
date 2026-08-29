@@ -57,14 +57,37 @@ export async function openDayDetail(
 
   // Task assignment state: taskId -> { assigned, visible }. Loaded from the
   // single source of truth (WorkDayTask incl. isVisible).
-  const taskState = new Map<string, { assigned: boolean; visible: boolean }>();
+  const taskState = new Map<string, {
+    assigned: boolean;
+    visible: boolean;
+    startTime: string;
+    endTime: string;
+    reminderEnabled: boolean;
+    reminderOffset: ReminderOffset;
+  }>();
   if (existing) {
     for (const a of await app.taskService.assignmentsForWorkDay(existing.id)) {
-      taskState.set(a.task.id, { assigned: true, visible: a.isVisible });
+      taskState.set(a.task.id, {
+        assigned: true,
+        visible: a.isVisible,
+        startTime: a.assignment.startTime ?? "",
+        endTime: a.assignment.endTime ?? "",
+        reminderEnabled: a.assignment.reminderEnabled ?? false,
+        reminderOffset: a.assignment.reminderOffset ?? "30min",
+      });
     }
   }
   for (const t of allTasks) {
-    if (!taskState.has(t.id)) taskState.set(t.id, { assigned: false, visible: true });
+    if (!taskState.has(t.id)) {
+      taskState.set(t.id, {
+        assigned: false,
+        visible: true,
+        startTime: "",
+        endTime: "",
+        reminderEnabled: false,
+        reminderOffset: "30min",
+      });
+    }
   }
 
   let note = existing?.note ?? "";
@@ -159,7 +182,15 @@ export async function openDayDetail(
         for (const [id, st] of taskState) {
           if (st.assigned && !current.has(id)) await app.taskService.addTask(id, wd.id);
           if (!st.assigned && current.has(id)) await app.taskService.removeTask(id, wd.id);
-          if (st.assigned) await app.taskService.setTaskVisibility(id, wd.id, st.visible);
+          if (st.assigned) {
+            await app.taskService.setTaskVisibility(id, wd.id, st.visible);
+            await app.taskService.setTaskDetails(id, wd.id, {
+              startTime: st.startTime || null,
+              endTime: st.endTime || null,
+              reminderEnabled: st.reminderEnabled,
+              reminderOffset: st.reminderEnabled ? st.reminderOffset : null,
+            });
+          }
         }
 
         if (reminderEnabled) {
@@ -169,6 +200,7 @@ export async function openDayDetail(
         }
       });
 
+      await app.notificationScheduler.reschedule();
       toast("Đã lưu");
       onChange();
       close();
@@ -304,7 +336,8 @@ export async function openDayDetail(
     }
 
     const w = workDay;
-    const visibleCodes = (await app.taskService.visibleTasksForWorkDay(w.id)).map((t) => t.code);
+    const visibleTasks = (await app.taskService.assignmentsForWorkDay(w.id))
+      .filter((a) => a.isVisible);
 
     parts.push(
       el("div", { class: "card", style: "margin-top:8px" }, [
@@ -320,8 +353,23 @@ export async function openDayDetail(
 
     parts.push(el("div", { class: "section-label", text: "Công việc" }));
     parts.push(
-      visibleCodes.length
-        ? el("div", { class: "chips" }, visibleCodes.map((c) => el("span", { class: "chip readonly", text: c })))
+      visibleTasks.length
+        ? el("div", { class: "task-list" }, visibleTasks.map(({ task, assignment }) =>
+            el("div", { class: "task-row" }, [
+              el("div", { class: "stack", style: "flex:1" }, [
+                el("div", { style: "font-weight:600", text: task.code }),
+                el("div", {
+                  class: "tiny",
+                  text: assignment.startTime && assignment.endTime
+                    ? `${assignment.startTime}–${assignment.endTime}`
+                    : task.name,
+                }),
+              ]),
+              assignment.reminderEnabled
+                ? el("span", { class: "badge-soon", text: offsetLabel(assignment.reminderOffset ?? "30min") })
+                : null,
+            ]),
+          ))
         : el("div", { class: "muted", text: "Không có task" }),
     );
 
@@ -453,9 +501,55 @@ export async function openDayDetail(
     });
     return el("div", { class: `task-row ${st.visible ? "" : "hidden-task"}` }, [
       eye,
-      el("div", { class: "stack", style: "flex:1" }, [
+      el("div", { class: "stack", style: "flex:1;gap:8px" }, [
         el("div", { style: "font-weight:600", text: t.code }),
-        el("div", { class: "tiny", text: st.visible ? "Đang hiển thị" : "Đang ẩn" }),
+        el("div", { class: "tiny", text: st.visible ? t.name : "Đang ẩn" }),
+        el("div", { class: "task-time-grid" }, [
+          el("label", { class: "field compact" }, [
+            el("span", { text: "Bắt đầu" }),
+            el("input", {
+              type: "time",
+              value: st.startTime,
+              onInput: (e: Event) => {
+                st.startTime = (e.target as HTMLInputElement).value;
+              },
+            }),
+          ]),
+          el("label", { class: "field compact" }, [
+            el("span", { text: "Kết thúc" }),
+            el("input", {
+              type: "time",
+              value: st.endTime,
+              onInput: (e: Event) => {
+                st.endTime = (e.target as HTMLInputElement).value;
+              },
+            }),
+          ]),
+        ]),
+        el("div", { class: "task-reminder-row" }, [
+          el("label", { class: "row task-reminder-toggle" }, [
+            el("span", { class: "tiny", text: "Nhắc việc" }),
+            el("input", {
+              type: "checkbox",
+              ...(st.reminderEnabled ? { checked: "checked" } : {}),
+              onChange: (e: Event) => {
+                st.reminderEnabled = (e.target as HTMLInputElement).checked;
+                if (st.reminderEnabled) void app.notificationScheduler.requestPermission();
+              },
+            }),
+          ]),
+          el(
+            "select",
+            {
+              onChange: (e: Event) => {
+                st.reminderOffset = (e.target as HTMLSelectElement).value as ReminderOffset;
+              },
+            },
+            ALL_REMINDER_OFFSETS.map((o) =>
+              el("option", { value: o, ...(o === st.reminderOffset ? { selected: "selected" } : {}) }, [offsetLabel(o)]),
+            ),
+          ),
+        ]),
       ]),
       remove,
     ]);

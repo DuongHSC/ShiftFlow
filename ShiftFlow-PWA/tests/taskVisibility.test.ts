@@ -22,6 +22,7 @@ import { WorkDayService } from "@/services/workday/workDayService";
 import { TaskService } from "@/services/tasks/taskService";
 import { ShiftConfigurationService } from "@/services/settings/shiftConfigurationService";
 import { SEED_IDS } from "@/domain/seed/seed";
+import { taskReminderFireDate } from "@/services/reminders/notificationScheduler";
 
 let dbCounter = 0;
 
@@ -116,6 +117,28 @@ describe("task visibility", () => {
     await ctx.tasks.setTaskVisibility(ticket.id, wd.id, true);
     const overview2 = (await ctx.tasks.visibleTasksForWorkDay(wd.id)).map((t) => t.code).sort();
     expect(overview2).toEqual(["MW", "Ticket"]);
+  });
+
+  it("stores task time and reminder details on the WorkDay assignment", async () => {
+    const wd = await createC5(ctx);
+    const meeting = await ctx.tasks.createTask("Meeting", "Meeting");
+    await ctx.tasks.addTask(meeting.id, wd.id);
+    await ctx.tasks.setTaskDetails(meeting.id, wd.id, {
+      startTime: "14:00",
+      endTime: "20:00",
+      reminderEnabled: true,
+      reminderOffset: "30min",
+    });
+
+    const [assignment] = await ctx.tasks.assignmentsForWorkDay(wd.id);
+    expect(assignment.assignment.startTime).toBe("14:00");
+    expect(assignment.assignment.endTime).toBe("20:00");
+    expect(assignment.assignment.reminderEnabled).toBe(true);
+    expect(assignment.assignment.reminderOffset).toBe("30min");
+
+    const fireDate = taskReminderFireDate(wd.date, "14:00", "30min");
+    expect(fireDate?.getHours()).toBe(13);
+    expect(fireDate?.getMinutes()).toBe(30);
   });
 });
 

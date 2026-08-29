@@ -23,6 +23,7 @@ async function boot(): Promise<void> {
 
   try {
     await app.bootstrap();
+    await app.notificationScheduler.start();
   } catch (err) {
     root.append(
       el("div", { class: "screen" }, [

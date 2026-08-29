@@ -873,7 +873,7 @@ label.field > span {
 }
 .task-row {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 12px;
   padding: 10px 12px;
   border: 1px solid var(--border);
@@ -897,6 +897,40 @@ label.field > span {
 }
 .eye-btn.off {
   filter: grayscale(1);
+}
+.task-time-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+label.field.compact {
+  margin-bottom: 0;
+}
+label.field.compact > span {
+  font-size: 12px;
+}
+label.field.compact input {
+  padding: 9px;
+}
+.task-reminder-row {
+  display: grid;
+  grid-template-columns: minmax(96px, auto) minmax(0, 1fr);
+  gap: 8px;
+  align-items: center;
+}
+.task-reminder-toggle {
+  justify-content: flex-start;
+  gap: 8px;
+}
+.task-reminder-row select {
+  padding: 9px;
+}
+
+@media (max-width: 400px) {
+  .task-time-grid,
+  .task-reminder-row {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* Compact tasks inside a calendar cell */

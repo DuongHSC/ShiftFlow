@@ -158,6 +158,13 @@ export interface WorkDayTask {
    * visibility — there is no per-screen visibility preference.
    */
   isVisible?: boolean;
+  /** Optional task-specific time on this WorkDay, formatted as "HH:mm". */
+  startTime?: string | null;
+  /** Optional task-specific end time on this WorkDay, formatted as "HH:mm". */
+  endTime?: string | null;
+  /** Optional reminder preference for this task assignment. */
+  reminderOffset?: ReminderOffset | null;
+  reminderEnabled?: boolean;
   createdAt: string; // ISO
   modifiedAt: string; // ISO
 }
