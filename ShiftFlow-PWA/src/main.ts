@@ -13,8 +13,11 @@ import { renderToday } from "@/ui/screens/todayScreen";
 import { renderCalendar } from "@/ui/screens/calendarScreen";
 import { renderSettings, resetSettingsView } from "@/ui/screens/settingsScreen";
 import { el } from "@/ui/components/dom";
+import { applyThemeMode } from "@/services/theme/themeService";
 
 async function boot(): Promise<void> {
+  applyThemeMode();
+
   const root = document.getElementById("app");
   if (!root) return;
 

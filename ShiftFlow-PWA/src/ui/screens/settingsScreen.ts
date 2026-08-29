@@ -16,6 +16,11 @@ import type { ScreenContext } from "@/ui/navigation/router";
 import { renderDataManagement } from "./dataManagementScreen";
 import { paletteEntries, shiftDefinitionHex } from "@/domain/models/shiftColor";
 import type { ShiftColor } from "@/domain/models/models";
+import {
+  getThemeMode,
+  setThemeMode,
+  type ThemeMode,
+} from "@/services/theme/themeService";
 
 type SettingsView =
   | "root"
@@ -23,7 +28,8 @@ type SettingsView =
   | "shifts"
   | "shiftEditor"
   | "tasks"
-  | "taskEditor";
+  | "taskEditor"
+  | "appearance";
 
 let view: SettingsView = "root";
 let editingShiftId: string | null = null; // null in editor = "add new"
@@ -56,6 +62,8 @@ export async function renderSettings(ctx: ScreenContext): Promise<HTMLElement> {
       return renderTaskList(ctx);
     case "taskEditor":
       return renderTaskEditor(ctx);
+    case "appearance":
+      return renderAppearance(ctx);
     default:
       return renderRoot(ctx);
   }
@@ -107,7 +115,7 @@ function renderRoot(ctx: ScreenContext): HTMLElement {
       row("\u2699", "Cấu hình ca làm việc", "Quản lý các ca và quy tắc", () => go(ctx, "shifts")),
       row("\u2611", "Quản lý công việc", "Thêm, sửa, bật/tắt công việc", () => go(ctx, "tasks")),
       row("\uD83D\uDD14", "Nhắc nhở", "Thiết lập thời gian nhắc", undefined, false),
-      row("\uD83C\uDFA8", "Giao diện", "Sáng / Tối / Tự động", undefined, false),
+      row("\uD83C\uDFA8", "Giao diện", "Sáng / Tối / Tự động", () => go(ctx, "appearance")),
     ]),
 
     el("div", { class: "section-label", text: "Quản lý dữ liệu" }),
@@ -163,7 +171,10 @@ async function renderShiftList(ctx: ScreenContext): Promise<HTMLElement> {
             style: `background:${shiftDefinitionHex(s)}`,
           }),
           el("div", { class: "stack" }, [
-            el("div", { style: "font-weight:700", text: s.code }),
+            el("div", {
+              style: "font-weight:700",
+              text: s.name && s.name !== s.code ? `${s.code} — ${s.name}` : s.code,
+            }),
             el("div", { class: "tiny", text: `Nghỉ ${hhmm(s.breakStartHour, s.breakStartMinute)}–${hhmm(s.breakEndHour, s.breakEndMinute)}` }),
           ]),
         ]),
@@ -202,13 +213,12 @@ async function renderShiftEditor(ctx: ScreenContext): Promise<HTMLElement> {
   let selectedColor: ShiftColor =
     existing?.color ?? "blue";
 
-  // Single user-facing identity field ("Tên ca"). Internally this is the shift
-  // code; existing shifts keep a stable code so the field is read-only on edit.
+  // Existing shifts keep a stable code for WorkDay lookup; the display name is
+  // editable and can differ from the code.
   const nameInput = el("input", {
     type: "text",
-    value: existing?.code ?? "",
+    value: existing?.name ?? "",
     placeholder: "Tên ca (vd: C6, Ca đêm)",
-    ...(existing ? { disabled: "disabled" } : {}),
   });
   const start = el("input", { type: "time", value: existing ? hhmm(existing.startHour, existing.startMinute) : "08:00" });
   const end = el("input", { type: "time", value: existing ? hhmm(existing.endHour, existing.endMinute) : "17:00" });
@@ -247,16 +257,16 @@ async function renderShiftEditor(ctx: ScreenContext): Promise<HTMLElement> {
     const nameValue = (nameInput as HTMLInputElement).value.trim();
     try {
       if (existing) {
-        // Code (identity) is stable; only times/color change here.
         await app.configService.updateShift({
           ...existing,
+          name: nameValue || existing.code,
           color: selectedColor,
           startHour: sh, startMinute: sm,
           endHour: eh, endMinute: em,
           breakStartHour: bsh, breakStartMinute: bsm,
           breakEndHour: beh, breakEndMinute: bem,
         });
-        toast(`Đã lưu ${existing.code}`);
+        toast(`Đã lưu ${nameValue || existing.code}`);
       } else {
         // The single "Tên ca" field becomes the code (and display name).
         const created = await app.configService.createShift({
@@ -293,7 +303,7 @@ async function renderShiftEditor(ctx: ScreenContext): Promise<HTMLElement> {
 
   return el("div", { class: "screen" }, [
     backBar(ctx, "‹ Cấu hình ca", "shifts"),
-    el("h1", { class: "screen-title", text: existing ? existing.code : "Thêm ca" }),
+    el("h1", { class: "screen-title", text: existing ? existing.name : "Thêm ca" }),
     el("div", { class: "card" }, [
       field("Tên ca", nameInput),
       el("label", { class: "field" }, [el("span", { text: "Màu ca" }), swatches]),
@@ -319,6 +329,51 @@ async function renderShiftEditor(ctx: ScreenContext): Promise<HTMLElement> {
 
 function field(label: string, input: HTMLElement): HTMLElement {
   return el("label", { class: "field" }, [el("span", { text: label }), input]);
+}
+
+// ---- Appearance ----
+
+function renderAppearance(ctx: ScreenContext): HTMLElement {
+  const mode = getThemeMode();
+  const options: { mode: ThemeMode; title: string; subtitle: string }[] = [
+    { mode: "system", title: "Tự động", subtitle: "Theo giao diện của thiết bị" },
+    { mode: "light", title: "Sáng", subtitle: "Nền sáng, dễ nhìn ban ngày" },
+    { mode: "dark", title: "Tối", subtitle: "Nền tối, dịu mắt ban đêm" },
+  ];
+
+  const rows = options.map((option) =>
+    el(
+      "div",
+      {
+        class: "list-row",
+        role: "button",
+        "aria-pressed": option.mode === mode ? "true" : "false",
+        onClick: () => {
+          setThemeMode(option.mode);
+          toast(`Đã chọn ${option.title}`);
+          ctx.refresh();
+        },
+      },
+      [
+        el("div", { class: "stack" }, [
+          el("div", { style: "font-weight:700", text: option.title }),
+          el("div", { class: "tiny", text: option.subtitle }),
+        ]),
+        el("span", {
+          class: option.mode === mode ? "checkmark" : "checkmark empty",
+          "aria-hidden": "true",
+          text: option.mode === mode ? "✓" : "",
+        }),
+      ],
+    ),
+  );
+
+  return el("div", { class: "screen" }, [
+    backBar(ctx, "‹ Cài đặt", "root"),
+    el("h1", { class: "screen-title", text: "Giao diện" }),
+    el("div", { class: "screen-subtitle", text: "Chọn cách ShiftFlow hiển thị trên thiết bị này." }),
+    el("div", { class: "list-group" }, rows),
+  ]);
 }
 
 // ---- Task list (compact) ----

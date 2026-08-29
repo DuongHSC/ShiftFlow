@@ -10,6 +10,11 @@ export default defineConfig({
   test: {
     globals: true,
     environment: "jsdom",
+    environmentOptions: {
+      jsdom: {
+        url: "https://shiftflow.local/",
+      },
+    },
     setupFiles: ["./tests/setup.ts"],
     include: ["tests/**/*.test.ts"],
     // Dexie/fake-indexeddb tests are stateful. A single worker keeps the suite

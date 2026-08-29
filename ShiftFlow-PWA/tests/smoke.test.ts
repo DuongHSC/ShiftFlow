@@ -9,7 +9,7 @@ import { app } from "@/services/appContainer";
 import { renderToday } from "@/ui/screens/todayScreen";
 import { renderCalendar } from "@/ui/screens/calendarScreen";
 import { renderUpcoming } from "@/ui/screens/upcomingScreen";
-import { renderSettings } from "@/ui/screens/settingsScreen";
+import { renderSettings, resetSettingsView } from "@/ui/screens/settingsScreen";
 import { renderDataManagement } from "@/ui/screens/dataManagementScreen";
 import { openDayDetail } from "@/ui/screens/dayDetailSheet";
 import type { ScreenContext } from "@/ui/navigation/router";
@@ -81,6 +81,54 @@ describe("screen smoke tests", () => {
     const node = await renderSettings(ctx);
     expect(node.querySelector(".screen-title")?.textContent).toContain("Cài đặt");
     expect(node.querySelectorAll(".list-group").length).toBeGreaterThan(0);
+  });
+
+  it("Settings shift editor can rename a shift without changing its code", async () => {
+    const c1 = await app.configService.lookup("C1");
+    expect(c1).toBeTruthy();
+
+    resetSettingsView();
+    let node = await renderSettings(ctx);
+    Array.from(node.querySelectorAll(".list-row"))
+      .find((row) => row.textContent?.includes("Cấu hình ca làm việc"))
+      ?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+
+    node = await renderSettings(ctx);
+    Array.from(node.querySelectorAll(".list-row"))
+      .find((row) => row.textContent?.includes("C1"))
+      ?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+
+    node = await renderSettings(ctx);
+    const nameInput = node.querySelector<HTMLInputElement>('input[type="text"]');
+    expect(nameInput).toBeTruthy();
+    expect(nameInput?.disabled).toBe(false);
+    nameInput!.value = "Ca sáng";
+
+    Array.from(node.querySelectorAll("button"))
+      .find((button) => button.textContent === "Lưu")
+      ?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    const renamed = await app.configService.lookup("C1");
+    expect(renamed?.shift.code).toBe("C1");
+    expect(renamed?.shift.name).toBe("Ca sáng");
+  });
+
+  it("Settings appearance screen can switch theme modes", async () => {
+    resetSettingsView();
+    let node = await renderSettings(ctx);
+    Array.from(node.querySelectorAll(".list-row"))
+      .find((row) => row.textContent?.includes("Giao diện"))
+      ?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+
+    node = await renderSettings(ctx);
+    expect(node.querySelector(".screen-title")?.textContent).toContain("Giao diện");
+
+    Array.from(node.querySelectorAll(".list-row"))
+      .find((row) => row.textContent?.includes("Tối"))
+      ?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+
+    expect(document.documentElement.dataset.theme).toBe("dark");
   });
 
   it("Data Management screen renders export/load actions", () => {
